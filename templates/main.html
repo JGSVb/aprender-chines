@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+* {
+	margin: 0px;
+	padding: 0px;
+	spacing: 0px;
+	outline: none;
+	border: none;
+
+	font-size: 30px;
+	font-family: monospace;
+	color: rgba(50,50,50,1);
+}
+
+body {
+	height: 100vh;
+	padding: 10px;
+}
+
+.box {
+	border: 1px solid rgba(0,0,0,0.4);
+	border-radius: 10px;
+	padding: 20px;
+	margin-bottom: 15px;
+
+}
+
+#embed-box {
+	height: 50%;
+}
+
+.embed {
+	width: 100%;
+	height: 100%;
+}
+
+#translator-box {
+	height: auto;
+	display: block;
+}
+
+button {
+	border-radius: 10px;
+	background-color: rgba(0,0,0,0.5);
+	color: white;
+	font-family: arial;
+	font-weight: bold;
+	text-shadow: 1px 2px 3px rgba(0,0,0,0.5);
+	box-shadow: 4px 2px 10px rgba(0,0,0,0.2);
+	font-size: 30px;
+	padding: 10px;
+	transition-duration: 0.2s;
+	cursor: pointer;
+}
+
+button:active {
+	background-color: blue;
+}
+
+.translator button {
+	width: 80%;
+	margin-left: 10%;
+}
+
+#custom-box {
+	height: auto;
+	display: block;
+}
+
+.tt {
+	font-weight: bold;
+	margin-right: 40px;
+}
+
+#ttcnen {
+	display: flex;
+	align-items: center;
+}
+
+.tt .preview {
+	font-weight: normal;
+	margin-left: 10px;
+	font-size: 20px;
+	text-decoration: underline;
+	color: rgba(30, 80, 160, 1);
+	cursor: pointer;
+}
+
+.create-anki-card {
+	width: 100%;
+}
+
+</style>
+</head>
+<body>
+
+<div class="box" id="embed-box">
+<iframe class="embed" src="https://www.youtube.com/embed/{{video_id}}"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<div class="box" id="translator-box">
+<div class="translator">
+	<button onclick="fetchTranslation()">Traduzir</button>
+	<div><div class="tt">Chinês para inglês</div><text id="translate-zh-en"></text></div>
+	<div><div class="tt" id="ttcnen">Chinês para inglês<text class="preview" id="preview"></text></div><text id="translate-zh-en2"></text></div>
+	<div><div class="tt">Inglês para Português</div><text id="translate-en-pt"></text></div>
+</div></div>
+<div class="box" id="custom-box">
+<div class="custom">
+	<text class="tt">Chinês</text><button onclick="myFunction()">Copiar</button>
+	<text id="chinese_text"></text>
+	<br>
+	<text class="tt">Pinyin</text><text id="pinyin_text"></text>
+</div></div>
+<button onclick="createAnkiCard()" class="create-anki-card">Criar cartão anki</button>
+<script>
+function myFunction() {
+  // Get the text field
+  var copyText = document.getElementById("chinese_text");
+  navigator.clipboard.writeText(copyText.textContent);
+
+  // Alert the copied text
+} 
+
+var retrievedTextDict = new Object();
+
+async function retrieveText(url, key) {
+	// Fetch the content of the page
+	return await fetch(url).then(function(response) {
+		if (!response.ok) {
+			throw new Error('Network response was not ok');
+		}
+		return response.text();
+	}).then(function(text) {
+		retrievedTextDict[key] = text;
+		ret = text;
+	}).catch(function(error) {
+		console.error('There was a problem with the fetch operation:', error);});
+}
+
+function setText(elem, text){
+	var e = document.getElementById(elem)
+	if(e.textContent != text){
+		e.textContent = text;
+	}
+
+}
+
+var myInterval = setInterval(async function() {
+
+	await retrieveText("fetch_text?type=chars", "chinese");
+	setText("chinese_text", retrievedTextDict["chinese"]);
+	await retrieveText("fetch_text?type=pinyin", "pinyin");
+	setText("pinyin_text", retrievedTextDict["pinyin"]);
+
+}, 500);
+
+async function fetchTranslation() {
+	await retrieveText("fetch_translation?way=zh-CN,en&text=" + retrievedTextDict["chinese"], "zh,en");
+	setText("translate-zh-en", retrievedTextDict["zh,en"]);
+
+	var zh = getSelection().toString();
+
+	await retrieveText("fetch_translation?way=zh-CN,en&text=" + zh, "zh,en2");
+	setText("translate-zh-en2", retrievedTextDict["zh,en2"]);
+
+	await retrieveText("fetch_translation?way=en,pt&text=" + retrievedTextDict["zh,en2"], "en,pt");
+	setText("translate-en-pt", retrievedTextDict["en,pt"]);
+}
+
+document.onselectionchange = () => {
+	var selection = document.getSelection().toString().trim();
+	if(selection == "") { return }
+	document.getElementById("preview").textContent = selection;
+};
+
+var preview = document.getElementById("preview");
+preview.addEventListener("click", function(e) {
+	open("https://www.yellowbridge.com/chinese/dictionary.php?word=" + preview.textContent);
+});
+
+function createAnkiCard(){
+	var A = document.getElementById("preview").textContent;
+	var D = document.getElementById("translate-en-pt").textContent;
+	var url = "anki_routine?A=" + A + "&D=" + D;
+	fetch(url);
+	open("https://ankiuser.net/add");
+}
+</script>
+
+</body>
+</html>
