@@ -5,10 +5,13 @@ import jieba
 from flask import Flask, render_template, request, jsonify, Response
 import requests
 
+from deep_translator import GoogleTranslator
+"""
 from deep_translator import (GoogleTranslator,
                              ChatGptTranslator,
                              YandexTranslator,
                              BaiduTranslator)
+"""
 
 from time import sleep
 from pynput.keyboard import Key, Controller
@@ -65,7 +68,7 @@ class Watchdog:
         self.reader = easyocr.Reader(['ch_sim',])
 
         self.has_content = False
-        self.chars = None
+        self.chinese = None
         self.pinyin = None
 
     def fetch_once(self):
@@ -89,10 +92,8 @@ class Watchdog:
         py = pinyin.get(" ".join(jieba.lcut(result)))
 
         self.pinyin = py
-        self.chars = result
+        self.chinese = result
         self.has_content = True
-        # pyperclip.copy(result)
-
 
 app = Flask(__name__)
 wg = Watchdog()
@@ -128,8 +129,8 @@ def fetch_text():
 
     if type == "pinyin":
         return wg.pinyin
-    elif type == "chars":
-        return wg.chars
+    elif type == "chinese":
+        return wg.chinese
 
     return "invalid_query"
 
@@ -140,7 +141,7 @@ def fetch_translation():
     source, target = way.split(",")
     return translate(text, source, target)
 
-def keyboard_click(ctrl, key, delay=0.1):
+def keyboard_click(ctrl, key, delay=0.05):
     ctrl.press(key)
     sleep(delay)
     ctrl.release(key)
@@ -162,7 +163,7 @@ def anki_routine():
 
     sleep(2)
     for x in seq:
-        sleep(0.25)
+        sleep(0.2)
         _v(x[0])(*x[1:])
 
 

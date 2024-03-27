@@ -1,0 +1,90 @@
+* {
+	margin: 0px;
+	padding: 0px;
+	spacing: 0px;
+	outline: none;
+	border: none;
+
+	font-size: 30px;
+	font-family: monospace;
+	color: rgba(50,50,50,1);
+}
+
+body {
+	height: 100vh;
+	padding: 10px;
+}
+
+.box {
+	border: 1px solid rgba(0,0,0,0.4);
+	border-radius: 10px;
+	padding: 20px;
+	margin-bottom: 15px;
+
+}
+
+#embed-box {
+	height: 50%;
+}
+
+.embed {
+	width: 100%;
+	height: 100%;
+}
+
+#translator-box {
+	height: auto;
+	display: block;
+}
+
+button {
+	border-radius: 10px;
+	background-color: rgba(0,0,0,0.5);
+	color: white;
+	font-family: arial;
+	font-weight: bold;
+	text-shadow: 1px 2px 3px rgba(0,0,0,0.5);
+	box-shadow: 4px 2px 10px rgba(0,0,0,0.2);
+	font-size: 30px;
+	padding: 10px;
+	transition-duration: 0.2s;
+	cursor: pointer;
+}
+
+button:active {
+	background-color: blue;
+}
+
+.translator button {
+	width: 80%;
+	margin-left: 10%;
+}
+
+#custom-box {
+	height: auto;
+	display: block;
+}
+
+.tt {
+	font-weight: bold;
+	margin-right: 40px;
+}
+
+#ttcnen {
+	display: flex;
+	align-items: center;
+}
+
+.tt .preview {
+	font-weight: normal;
+	margin-left: 10px;
+	font-size: 20px;
+	text-decoration: underline;
+	color: rgba(30, 80, 160, 1);
+	cursor: pointer;
+}
+
+.create-anki-card {
+	width: 100%;
+}
+
