@@ -5,16 +5,24 @@
 </head>
 <body>
 
+<!--
+<div id="overlay">
+    <div id="dialog">
+        <h2>Criar Cartão Anki</h2>
+        <input type="text" id="question-A" placeholder="Pergunta A"><br>
+        <input type="text" id="question-B" placeholder="Pergunta B"><br>
+        <input type="text" id="awnser" placeholder="Resposta"><br>
+        <input type="text" id="meaning" placeholder="Significado"><br>
+        <button onclick="submitDetails()">Submit</button>
+    </div>
+</div>
+-->
+
+
 <div class="box" id="embed-box">
 <iframe class="embed" src="https://www.youtube.com/embed/{{video_id}}"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
-<div class="box" id="translator-box">
-<div class="translator">
-	<button onclick="fetchTranslation()">Traduzir</button>
-	<div><div class="tt">Chinês para inglês</div><text id="translate-zh-en"></text></div>
-	<div><div class="tt" id="ttcnen">Chinês para inglês<text class="preview" id="preview"></text></div><text id="translate-zh-en2"></text></div>
-	<div><div class="tt">Inglês para Português</div><text id="translate-en-pt"></text></div>
-</div></div>
+
 <div class="box" id="custom-box">
 <div class="custom">
 	<text class="tt">Chinês</text><button onclick="myFunction()">Copiar</button>
@@ -22,8 +30,23 @@
 	<br>
 	<text class="tt">Pinyin</text><text id="pinyin_text"></text>
 </div></div>
+
+<div class="box" id="translator-box">
+	<div class="translator">
+		<button onclick="fetchTranslation()">Traduzir</button>
+		<div><div class="tt">Frase (EN)</div><text id="translate-zh-en"></text></div>
+		<div><div class="tt" id="ttcnen">Seleção (EN)<text class="preview" id="preview"></text></div><text id="translate-zh-en2"></text></div>
+		<div><div class="tt">Seleção (PT)</div><text id="translate-en-pt"></text></div>
+	</div>
+</div>
+
+<div class="box" id="dict"></div>
+
 <button onclick="createAnkiCard()" class="create-anki-card">Criar cartão anki</button>
 
+
+<script src="{{url_for('static', filename='dict.js')}}"></script>
 <script src="{{url_for('static', filename='script.js')}}"></script>
+
 </body>
 </html>

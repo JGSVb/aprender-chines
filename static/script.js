@@ -4,12 +4,18 @@ const translationDst = ["", "", ""];
 const translationPairs = [
 	["zh-CN", "en"],
 	["zh-CN", "en"],
-	["en", "pt"]
+	["en", "pt"],
+	["en", "pt"],
 ];
 
 var chineseText = "";
 var pinyinText = "";
 var chineseSegment = "";
+
+var chineseDictionary = [];
+
+var dictDiv = document.getElementById("dict")
+
 
 async function retrieveText(url) {
 	// Fetch the content of the page
@@ -67,14 +73,23 @@ var _fetchTexts = setInterval(async function() {
 }, 700);
 
 async function fetchTranslation() {
-	var t = await translate(0, chineseText);
+	var t = await translate(0, chineseText.replace(/\s/g, ''));
 	setText("translate-zh-en", t);
 
-	t = await translate(1, chineseSegment);
+	t = await translate(1, chineseSegment.replace(/\s/g, ''));
 	setText("translate-zh-en2", t);
 
 	t = await translate(2, t);
 	setText("translate-en-pt", t);
+}
+
+async function updateDictionary() {
+	var resp = await retrieveText("dicthtml?query=" + chineseSegment);
+	if(resp==""){ return; }
+
+	dictDiv.innerHTML = resp;
+
+	dictHTML();
 }
 
 document.onselectionchange = () => {
@@ -83,17 +98,12 @@ document.onselectionchange = () => {
 
 	chineseSegment = selection;
 	document.getElementById("preview").textContent = chineseSegment;
+
+	updateDictionary();
 };
 
-var preview = document.getElementById("preview");
-preview.addEventListener("click", function(e) {
-	open("https://www.yellowbridge.com/chinese/dictionary.php?word=" + chineseSegment);
-});
-
 function createAnkiCard(){
-	var A = document.getElementById("preview").textContent;
-	var D = document.getElementById("translate-en-pt").textContent;
-	var url = "anki_routine?A=" + A + "&D=" + D;
-	fetch(url);
-	open("https://ankiuser.net/add");
+	let card = prompt("a", "b", "c", "d");
 }
+
+

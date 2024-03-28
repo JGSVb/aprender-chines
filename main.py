@@ -3,7 +3,6 @@ import pinyin
 import easyocr
 import jieba
 from flask import Flask, render_template, request, jsonify, Response
-import requests
 
 from deep_translator import GoogleTranslator
 """
@@ -14,16 +13,33 @@ from deep_translator import (GoogleTranslator,
 """
 
 from time import sleep
-from pynput.keyboard import Key, Controller
+
+from parser import parsed_dict
+
+from functools import lru_cache
 
 translator = {}
 
+@lru_cache()
 def translate(text, source, target):
+    # return f"translate() temporáriamente desativada\n"
     key = ",".join([source, target])
     if not key in translator.keys():
         translator[key] = GoogleTranslator(source=source, target=target)
 
     return translator[key].translate(text = text)
+
+@lru_cache()
+def get_dictionary_for(query):
+    entries = []
+
+    for e in parsed_dict:
+        if e["simplified"] == query or e["traditional"] == query or e["pinyin"] == query:
+
+            e["portuguese"] = translate(e["english"], "en", "pt")
+            entries.append(e)
+
+    return entries
 
 def verbose(f):
     def inner(*args, **kwargs):
@@ -87,9 +103,11 @@ class Watchdog:
         f = diff[-1]
 
         result = self.reader.readtext(f, detail = 0)
-        result = " ".join(result)
+        result = "".join(result)
+        result = result.replace(" ", "")
+        result = " ".join(jieba.lcut(result))
 
-        py = pinyin.get(" ".join(jieba.lcut(result)))
+        py = pinyin.get(result)
 
         self.pinyin = py
         self.chinese = result
@@ -141,32 +159,15 @@ def fetch_translation():
     source, target = way.split(",")
     return translate(text, source, target)
 
-def keyboard_click(ctrl, key, delay=0.05):
-    ctrl.press(key)
-    sleep(delay)
-    ctrl.release(key)
+@app.get("/dicthtml")
+def dicthtml():
+    query = request.args.get("query")
+    entries = get_dictionary_for(query)
+    return render_template("dict.html", entries = entries)
 
 @app.get("/anki_routine")
 def anki_routine():
-    a = request.args.get("A")
-    d = request.args.get("D")
-    keyboard = Controller()
-
-    seq = [
-            (keyboard.type,  a),
-            (keyboard_click, keyboard, Key.tab),
-            (keyboard.type,  pinyin.get(a)),
-            (keyboard_click, keyboard, Key.tab),
-            (keyboard.type,  wg.chars),
-            (keyboard_click, keyboard, Key.tab),
-            (keyboard.type,  d),]
-
-    sleep(2)
-    for x in seq:
-        sleep(0.2)
-        _v(x[0])(*x[1:])
-
-
+    print("refazer com copy paste em vez de pynput.type etc...")
     return ""
 
 def main():
@@ -178,7 +179,6 @@ def main():
 
 
     app.run(debug=True)
-    # watchdog()
 
 if __name__ == "__main__":
     main()
