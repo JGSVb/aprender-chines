@@ -9,15 +9,14 @@ const translationPairs = [
 ];
 
 var chineseText = "";
+var chineseWords = [];
 var pinyinText = "";
 var chineseSegment = "";
 
-var chineseDictionary = [];
-
-var dictDiv = document.getElementById("dict")
+var dictionary = [];
 
 
-async function retrieveText(url) {
+async function retrieveData(url) {
 	// Fetch the content of the page
 	return await fetch(url).then(function(response) {
 		if (!response.ok) {
@@ -39,20 +38,16 @@ async function translate(id, text){
 	translationSrc[id] = text;
 
 	var pair = translationPairs[id];
-	var result = await retrieveText("fetch_translation?way=" + pair.join(",") + "&text=" + text);
+	var result = await retrieveData("translate?way=" + pair.join(",") + "&text=" + text);
 
 	translationDst[id] = result;
 	return translationDst[id];
 
 }
 
-function myFunction() {
-  // Get the text field
-  var copyText = document.getElementById("chinese_text");
-  navigator.clipboard.writeText(copyText.textContent);
-
-  // Alert the copied text
-} 
+function copyChineseText() {
+  navigator.clipboard.writeText(chineseText);
+}
 
 
 function setText(elem, text){
@@ -65,10 +60,27 @@ function setText(elem, text){
 
 var _fetchTexts = setInterval(async function() {
 
-	chineseText = await retrieveText("fetch_text?type=chinese");
-	setText("chinese_text", chineseText);
-	pinyinText = await retrieveText("fetch_text?type=pinyin");
-	setText("pinyin_text", pinyinText);
+	var text = await fetch("fetch_chinese").then(response => response.text());
+
+	if(text == chineseText) {
+		return;
+	}
+
+
+	chineseText = text;
+
+	chineseWords = await fetch("words?chinese=" + chineseText).then(response => response.json());
+
+	var chineseDiv = document.getElementById("chineseTextWords");
+	chineseDiv.innerHTML = "";
+	var pinyinDiv = document.getElementById("pinyinTextWords");
+	pinyinDiv.innerHTML = "";
+
+	chineseWords.forEach(async w => {
+		chineseDiv.innerHTML += "<div>" + w + "</div>";
+		var p = await fetch("pinyin?chinese=" + w).then(response => response.text());
+		pinyinDiv.innerHTML += "<div>" + p + "</div>";
+	});
 
 }, 700);
 
@@ -83,18 +95,74 @@ async function fetchTranslation() {
 	setText("translate-en-pt", t);
 }
 
-async function updateDictionary() {
-	var resp = await retrieveText("dicthtml?query=" + chineseSegment);
-	if(resp==""){ return; }
+function collapsible(coll){
+	coll.addEventListener("click", function() {
+		this.classList.toggle("active");
+		var content = this.nextElementSibling;
 
-	dictDiv.innerHTML = resp;
-
-	dictHTML();
+		if (content.style.maxHeight){
+			content.style.maxHeight = null;
+		} else {
+			content.style.maxHeight = content.scrollHeight + "px";
+		}
+	});
 }
 
+async function updateDictionary() {
+	const data = await fetch("dictionary?query=" + chineseSegment).then(response => response.json());
+	if(data.length == 0) { return; }
+
+	dictionary = data;
+
+	const dictionaryContainer = document.getElementById("dictionaryContainer");
+	dictionaryContainer.innerHTML = "";
+
+	const dictionaryTemplate = document.getElementById("dictionaryTemplate");
+
+	dictionary.forEach(entry => {
+		const clone = document.importNode(dictionaryTemplate.content, true);
+
+		collapsible(clone.getElementById("dictionaryEntryName"));
+
+		if(entry.simplified != entry.traditional){
+			clone.getElementById("dictionaryEntryName").innerHTML = entry.simplified + " ( " + entry.traditional + " )";
+		} else {
+			clone.getElementById("dictionaryEntryName").innerHTML = entry.simplified;
+		}
+
+		clone.getElementById("dictionaryPinyin").innerHTML = entry.pinyin;
+		clone.getElementById("dictionaryPortuguese").innerHTML = entry.portuguese;
+		dictionaryContainer.appendChild(clone);
+	});
+}
+
+function getSelectedTextWithinDiv(parentDivId) {
+        let selectedText = "";
+        const parentDiv = document.getElementById(parentDivId);
+        const selection = window.getSelection();
+
+        if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const container = document.createElement("div");
+
+                // Check if the selection is within the parentDiv
+                if (parentDiv.contains(range.commonAncestorContainer)) {
+                        container.appendChild(range.cloneContents());
+                        selectedText = container.innerText; // Use innerText to get plain text
+                }
+        }
+
+        return selectedText;
+}
+
+
 document.onselectionchange = () => {
-	var selection = document.getSelection().toString().trim();
-	if(selection == "" || selection.match("\n") || !selection.match(/[\u3400-\u9FBF]/)) { return }
+
+	var selection = getSelectedTextWithinDiv("chineseTextWords");
+
+	if(selection.length == 0) {
+		return;
+	}
 
 	chineseSegment = selection;
 	document.getElementById("preview").textContent = chineseSegment;

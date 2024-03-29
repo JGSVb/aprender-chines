@@ -1,11 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+
+	<template id="dictionaryTemplate">
+		<div class="dictionary-box">
+
+			<button type="button" class="collapsible" id="dictionaryEntryName"></button>
+
+			<div class="collapsible-content">
+				<div>
+					<text id="dictionaryPinyin" class="dictionary-field"></text>
+				</div>
+				<div>
+					<text id="dictionaryPortuguese" class="dictionary-field"></text>
+				</div>
+			</div>
+		</div>
+	</template>
+
 </head>
 <body>
 
-<!--
 <div id="overlay">
     <div id="dialog">
         <h2>Criar Cartão Anki</h2>
@@ -13,23 +29,25 @@
         <input type="text" id="question-B" placeholder="Pergunta B"><br>
         <input type="text" id="awnser" placeholder="Resposta"><br>
         <input type="text" id="meaning" placeholder="Significado"><br>
-        <button onclick="submitDetails()">Submit</button>
+        <button onclick="submitDetails()">Criar</button>
     </div>
 </div>
--->
-
 
 <div class="box" id="embed-box">
 <iframe class="embed" src="https://www.youtube.com/embed/{{video_id}}"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 
 <div class="box" id="custom-box">
-<div class="custom">
-	<text class="tt">Chinês</text><button onclick="myFunction()">Copiar</button>
-	<text id="chinese_text"></text>
-	<br>
-	<text class="tt">Pinyin</text><text id="pinyin_text"></text>
-</div></div>
+	<div class="custom">
+		<div class="chineseOrPinyinBox">
+			<div class="textWords" id="chineseTextWords"></div>
+			<button onclick="copyChineseText()">Copiar</button>
+		</div>
+		<div id="chineseOrPinyinBox">
+			<div class="textWords" id="pinyinTextWords"></div>
+		</div>
+	</div>
+</div>
 
 <div class="box" id="translator-box">
 	<div class="translator">
@@ -40,12 +58,11 @@
 	</div>
 </div>
 
-<div class="box" id="dict"></div>
+<div class="box" id="dictionaryContainer"></div>
 
 <button onclick="createAnkiCard()" class="create-anki-card">Criar cartão anki</button>
 
 
-<script src="{{url_for('static', filename='dict.js')}}"></script>
 <script src="{{url_for('static', filename='script.js')}}"></script>
 
 </body>

@@ -91,32 +91,12 @@ button:active {
 	margin-top: 10px;
 }
 
-.dictbox {
+.dictionary-box {
 	margin: 10px;
 	padding: 10px;
 	border: solid rgb(50,50,50);
 	border-width: 3px;
 	border-radius: 10px;
-}
-
-.dictfield {
-	text-decoration: underline;
-}
-
-#simplified {
-	font-weight: normal;
-	margin-left: 10px;
-	text-decoration: underline;
-	color: rgb(30, 80, 160);
-	cursor: pointer;
-}
-
-#traditional {
-	font-weight: normal;
-	margin-left: 10px;
-	text-decoration: underline;
-	color: rgb(30, 80, 160);
-	cursor: pointer;
 }
 
 .collapsible {
@@ -129,7 +109,7 @@ button:active {
 	height: 100%;
 }
 
-.content {
+.collapsible-content {
 	max-height: 0;
 	overflow: hidden;
 	transition: max-height 0.1s ease-out;
@@ -160,13 +140,17 @@ button:active {
     align-items: center;
 }
 
+#dialog h2 {
+	margin: 20px;
+}
+
 input {
 	border: 2px solid rgba(0,0,0,0.5);
 	border-radius: 10px;
 	margin: 5px;
-	padding: 5px;
+	padding: 15px;
 	transition-duration: 0.2s;
-	width: 100%;
+	width: 90%;
 }
 
 input:focus {
@@ -174,3 +158,15 @@ input:focus {
 	caret-color: rgb(30, 80, 160);
 }
 
+.chineseOrPinyinBox {
+	display: flex;
+	align-items: center;
+}
+
+.textWords {
+	display: flex;
+}
+
+.textWords div {
+	margin-right: 10px;
+}

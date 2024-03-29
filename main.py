@@ -1,10 +1,8 @@
 import os
 import pinyin
-import easyocr
 import jieba
 from flask import Flask, render_template, request, jsonify, Response
 
-from deep_translator import GoogleTranslator
 """
 from deep_translator import (GoogleTranslator,
                              ChatGptTranslator,
@@ -12,171 +10,68 @@ from deep_translator import (GoogleTranslator,
                              BaiduTranslator)
 """
 
-from time import sleep
-
-from parser import parsed_dict
-
-from functools import lru_cache
-
-translator = {}
-
-@lru_cache()
-def translate(text, source, target):
-    # return f"translate() temporáriamente desativada\n"
-    key = ",".join([source, target])
-    if not key in translator.keys():
-        translator[key] = GoogleTranslator(source=source, target=target)
-
-    return translator[key].translate(text = text)
-
-@lru_cache()
-def get_dictionary_for(query):
-    entries = []
-
-    for e in parsed_dict:
-        if e["simplified"] == query or e["traditional"] == query or e["pinyin"] == query:
-
-            e["portuguese"] = translate(e["english"], "en", "pt")
-            entries.append(e)
-
-    return entries
-
-def verbose(f):
-    def inner(*args, **kwargs):
-        err = None
-        ret = None
-
-        try:
-            ret = f(*args, **kwargs)
-        except Exception as e:
-            err = e
-
-        print(ret, f.__name__, args, kwargs)
-
-        if err:
-            raise err
-        return ret
-
-    return inner
+from utils import *
 
 _v = verbose
 
-@verbose
-def system(cmd):
-    return os.system(cmd)
-
 class CONFIG:
     target_dir = os.path.join(os.path.dirname(__file__), "target")
-    cmd = "xdg-open https://fanyi.baidu.com/#zh/en/{}"
-    delay = 0.7
-
-def touch(filepath : str):
-    if(os.path.exists(filepath)):
-        raise FileExistsError
-
-    with open(filepath, "w") as f:
-        pass
-
-class Watchdog:
-    def __init__(self):
-        self.before = []
-        self.actual= []
-        self.reader = easyocr.Reader(['ch_sim',])
-
-        self.has_content = False
-        self.chinese = None
-        self.pinyin = None
-
-    def fetch_once(self):
-
-        self.actual = os.listdir(CONFIG.target_dir)
-
-        diff = [x for x in self.actual if x not in self.before]
-        diff = [os.path.join(CONFIG.target_dir, x) for x in diff]
-        diff = [x for x in diff if x.endswith(".png")]
-
-        self.before = self.actual
-
-        if not diff:
-            return
-
-        f = diff[-1]
-
-        result = self.reader.readtext(f, detail = 0)
-        result = "".join(result)
-        result = result.replace(" ", "")
-        result = " ".join(jieba.lcut(result))
-
-        py = pinyin.get(result)
-
-        self.pinyin = py
-        self.chinese = result
-        self.has_content = True
 
 app = Flask(__name__)
-wg = Watchdog()
-
-@app.after_request
-def add_security_headers(response):
-    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    return response
-
-@app.route('/embed')
-def embed():
-    # Get the URL of the website to embed from the query parameters
-    url = request.args.get('url')
-    
-    # Fetch the content of the website
-    response = requests.get(url)
-    
-    # Return the content as a response
-    return Response(response.content, content_type=response.headers['content-type'])
+wg = Watchdog(CONFIG.target_dir)
 
 @app.route("/")
 def main_page():
     video_id = request.args.get("url")
     return render_template("main.html", video_id = video_id)
 
-@app.get("/fetch_text")
-def fetch_text():
+@app.get("/fetch_chinese")
+def fetch_chinese():
     wg.fetch_once()
-    type = request.args.get("type")
+    return wg.chinese if wg.chinese else ""
 
-    if not wg.has_content:
-        return ""
+@app.get("/pinyin")
+def pinyin_():
+    text = request.args.get("chinese")
+    return pinyin.get(text)
 
-    if type == "pinyin":
-        return wg.pinyin
-    elif type == "chinese":
-        return wg.chinese
+@app.get("/words")
+def split_words():
+    text = request.args.get("chinese")
+    return jsonify(list(jieba.cut(text)))
 
-    return "invalid_query"
-
-@app.get("/fetch_translation")
-def fetch_translation():
+@app.get("/translate")
+def translate_():
     text = request.args.get("text")
     way = request.args.get("way")
     source, target = way.split(",")
     return translate(text, source, target)
 
-@app.get("/dicthtml")
-def dicthtml():
+@app.get("/dictionary")
+def dictionary():
     query = request.args.get("query")
     entries = get_dictionary_for(query)
-    return render_template("dict.html", entries = entries)
+    return jsonify(entries)
 
 @app.get("/anki_routine")
 def anki_routine():
     print("refazer com copy paste em vez de pynput.type etc...")
     return ""
 
-def main():
-    _v(os.makedirs)(CONFIG.target_dir, exist_ok=True)
+def clean():
 
     for file in os.listdir(CONFIG.target_dir):
         path = os.path.join(CONFIG.target_dir, file)
         os.rename(path, path+"_")
 
+def main():
+    _v(os.makedirs)(CONFIG.target_dir, exist_ok=True)
+
+    print("""Temporariamente desativado: """
+    """
+    clean()
+    """
+    )
 
     app.run(debug=True)
 
