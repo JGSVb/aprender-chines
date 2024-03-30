@@ -1,8 +1,9 @@
+import os
+import easyocr
 from deep_translator import GoogleTranslator
 from parser import parsed_dict
 from functools import lru_cache
-import easyocr
-import os
+from pinyin_tone_converter.pinyin_tone_converter import PinyinToneConverter
 
 translator = {}
 
@@ -53,9 +54,10 @@ def get_dictionary_for(query):
     entries = []
 
     for e in parsed_dict:
-        if e["simplified"] == query or e["traditional"] == query or e["pinyin"] == query:
+        if e["simplified"] == query or e["traditional"] == query:
 
             e["portuguese"] = translate(e["english"], "en", "pt")
+            e["pinyin"] = PinyinToneConverter().convert_text(e["pinyin"])
             entries.append(e)
 
     return entries
@@ -77,3 +79,155 @@ def verbose(f):
         return ret
 
     return inner
+
+
+class AnkiFile:
+
+    instances = []
+
+    @classmethod
+    def get_instance_by_filepath(cls, filepath):
+        for i in cls.instances:
+            if i.filepath == filepath:
+                return i
+
+        return None
+
+    @classmethod
+    def register(cls, self):
+        if(cls.get_instance_by_filepath(self.filepath)):
+            raise Exception("Já existe uma instância cujo filepath é " + self.filepath)
+
+        cls.instances.append(self)
+
+    @classmethod
+    def unregister(cls, self):
+        cls.instances.remove(self)
+
+    @classmethod
+    def by_filepath(cls, filepath):
+        filepath = os.path.abspath(filepath)
+
+        i = cls.get_instance_by_filepath(filepath)
+
+        if(i):
+            return i
+        else:
+            return AnkiFile(filepath)
+
+    def __init__(self, filepath):
+        filepath = os.path.abspath(filepath)
+        self.filepath = filepath
+        AnkiFile.register(self)
+
+        self.cards = []
+        self.read()
+
+    def __del__(self):
+        AnkiFile.unregister(self)
+
+    @staticmethod
+    def prop_get_name(line):
+        if line[0] != "#":
+            return None, line
+
+        name = ""
+        i = 1
+        while line[i] != ":":
+            name += line[i]
+            i += 1
+
+        leftover = line[i:]
+
+        return name, leftover
+
+    @staticmethod
+    def prop_get_value(line):
+        if line[0] != ":":
+            return None
+
+        value = ""
+        i = 1
+        while line[i] != "\n":
+            value += line[i]
+            i += 1
+
+        return value
+
+    @staticmethod
+    def read_prop(line):
+        name, leftover = AnkiFile.prop_get_name(line)
+        value = AnkiFile.prop_get_value(leftover)
+
+        return name, value
+
+    @staticmethod
+    def props_are_supported(props):
+        keys = props.keys()
+
+        if len(keys) != 2:
+            return False
+
+        if not ("separator" in keys and "html" in keys):
+            return False
+
+        if props["separator"] == "tab" and props["html"] == "false":
+            return True
+
+        return False
+
+
+    def read(self):
+        if not os.path.exists(self.filepath):
+            open(self.filepath, "w+").close()
+            return
+
+        lines = []
+
+        with open(self.filepath, "r") as f:
+            lines = f.readlines()
+
+        read_prop = True
+        props = {}
+        name = None
+        value = None
+
+        for l in lines:
+            if read_prop:
+                name, value = self.read_prop(l)
+
+            if name == None:
+                read_prop = False
+                if not AnkiFile.props_are_supported(props):
+                    raise Exception(f"As propriedades do ficheiro {self.filepath} não são suportadas ({props})")
+            else:
+                props[name] = value
+                continue
+
+            card = l.split("\t")
+            # tirar \n do final
+            card[-1] = card[-1][:-1]
+            self.cards.append(card)
+
+    def get_write_content(self):
+        lines = [
+                "#separator:tab\n",
+                "#html:false\n"
+                ]
+
+        for c in self.cards:
+            lines.append("\t".join(c)+"\n")
+
+        return lines
+
+    def add_card(self, a,b,c,d, write = False):
+        self.cards.append([a,b,c,d])
+
+        if(write):
+            self.write()
+
+    def write(self):
+        lines = self.get_write_content()
+
+        with open(self.filepath, "w") as f:
+            f.writelines(lines)

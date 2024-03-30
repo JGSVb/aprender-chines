@@ -19,51 +19,62 @@
 		</div>
 	</template>
 
+	<template id="optionTemplate">
+		<option id="realOption"></option>
+        	<option id="fakeOption" disabled style="font-style:italic"></option>
+	</template>
+
 </head>
 <body>
 
-<div id="overlay">
-    <div id="dialog">
-        <h2>Criar Cartão Anki</h2>
-        <input type="text" id="question-A" placeholder="Pergunta A"><br>
-        <input type="text" id="question-B" placeholder="Pergunta B"><br>
-        <input type="text" id="awnser" placeholder="Resposta"><br>
-        <input type="text" id="meaning" placeholder="Significado"><br>
-        <button onclick="submitDetails()">Criar</button>
-    </div>
-</div>
+	<div id="overlay">
+	    <div id="dialog">
+		<h2>Criar Cartão Anki</h2>
+		<select id="dictionaryEntrySelector" onchange="dictionaryEntrySelectorChanged()"></select>
+		<input type="text" id="questionA" placeholder="Pergunta A">
+		<input type="text" id="questionB" placeholder="Pergunta B">
+		<input type="text" id="awnser" placeholder="Resposta">
+		<input type="text" id="meaning" placeholder="Significado">
+		<button onclick="submitAnkiCardButton()">Criar</button>
+	    </div>
+	</div>
 
-<div class="box" id="embed-box">
-<iframe class="embed" src="https://www.youtube.com/embed/{{video_id}}"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-</div>
+	<div class="box" id="infoBox">
+		<h2>{{project_name}}</h2>
+		<h2>{{video_id}}</h2>
+	</div>
 
-<div class="box" id="custom-box">
-	<div class="custom">
-		<div class="chineseOrPinyinBox">
-			<div class="textWords" id="chineseTextWords"></div>
-			<button onclick="copyChineseText()">Copiar</button>
-		</div>
-		<div id="chineseOrPinyinBox">
-			<div class="textWords" id="pinyinTextWords"></div>
+	<div class="box" id="embed-box">
+	<iframe class="embed" src="https://www.youtube.com/embed/{{video_id}}"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+	</div>
+
+	<div class="box" id="custom-box">
+		<div class="custom">
+			<div class="chineseOrPinyinBox">
+				<div class="textWords" id="chineseTextWords"></div>
+				<button onclick="copyChineseText()">Copiar</button>
+			</div>
+			<div id="chineseOrPinyinBox">
+				<div class="textWords" id="pinyinTextWords"></div>
+			</div>
 		</div>
 	</div>
-</div>
 
-<div class="box" id="translator-box">
-	<div class="translator">
-		<button onclick="fetchTranslation()">Traduzir</button>
-		<div><div class="tt">Frase (EN)</div><text id="translate-zh-en"></text></div>
-		<div><div class="tt" id="ttcnen">Seleção (EN)<text class="preview" id="preview"></text></div><text id="translate-zh-en2"></text></div>
-		<div><div class="tt">Seleção (PT)</div><text id="translate-en-pt"></text></div>
+	<div class="box" id="translator-box">
+		<div class="translator">
+			<button onclick="fetchTranslation()">Traduzir</button>
+			<div><div class="tt">Frase (EN)</div><text id="translate-zh-en"></text></div>
+			<div><div class="tt" id="ttcnen">Seleção (EN)<text class="preview" id="preview"></text></div><text id="translate-zh-en2"></text></div>
+			<div><div class="tt">Seleção (PT)</div><text id="translate-en-pt"></text></div>
+		</div>
 	</div>
-</div>
 
-<div class="box" id="dictionaryContainer"></div>
+	<div class="box" id="dictionaryContainer"></div>
 
-<button onclick="createAnkiCard()" class="create-anki-card">Criar cartão anki</button>
+	<button onclick="createAnkiCardButton()" class="create-anki-card">Criar cartão anki</button>
 
 
-<script src="{{url_for('static', filename='script.js')}}"></script>
+	<script src="{{url_for('static', filename='script.js')}}"></script>
 
 </body>
 </html>

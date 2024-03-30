@@ -170,8 +170,64 @@ document.onselectionchange = () => {
 	updateDictionary();
 };
 
-function createAnkiCard(){
-	let card = prompt("a", "b", "c", "d");
+function dictionaryEntrySelectorChanged(){
+	const selector = document.getElementById("dictionaryEntrySelector");
+	var index = selector.value;
+
+	var questionA = document.getElementById("questionA");
+	var questionB = document.getElementById("questionB");
+	var meaning = document.getElementById("meaning");
+
+	questionA.value = dictionary[index].simplified;
+	questionB.value = dictionary[index].pinyin;
+	meaning.value = dictionary[index].portuguese;
 }
 
+function createAnkiCardButton(){
+	var overlay = document.getElementById("overlay");
+	overlay.style.display = "flex";
 
+	var selector = document.getElementById("dictionaryEntrySelector");
+	selector.innerHTML = "";
+
+	const optionTemplate = document.getElementById("optionTemplate");
+
+	var i = 0;
+	dictionary.forEach(entry => {
+		const clone = document.importNode(optionTemplate.content, true);
+		const real = clone.getElementById("realOption");
+		real.value = i++;
+
+		if(entry.simplified == entry.traditional){
+			real.innerHTML = entry.simplified;
+		} else {
+			real.innerHTML = entry.simplified + " (" + entry.traditional + ")";
+		}
+		real.innerHTML += ", " + entry.pinyin;
+
+		const fake = clone.getElementById("fakeOption");
+		fake.innerHTML = entry.portuguese;
+
+		selector.appendChild(clone);
+	});
+
+	var awnser = document.getElementById("awnser");
+	awnser.value = chineseText;
+
+	selector.value = 0;
+	dictionaryEntrySelectorChanged();
+}
+
+async function submitAnkiCardButton(){
+	var questionA = document.getElementById("questionA").value;
+	var questionB = document.getElementById("questionB").value;
+	var awnser = document.getElementById("awnser").value;
+	var meaning = document.getElementById("meaning").value;
+
+	await fetch("anki_routine?question_a=" 	+ questionA +
+				"&question_b=" 	+ questionB +
+				"&awnser=" 	+ awnser +
+				"&meaning=" 	+ meaning);
+
+	overlay.style.display = "none";
+}
