@@ -68,17 +68,16 @@ class Project:
         return len(self.data["chinese_text"])
 
     def get_chinese_text(self, age, safe = True):
-        if not self.data["chinese_text"]:
+        if not self.data["chinese_text"] and safe:
             return ""
 
-        rev = self.data["chinese_text"].copy()
-        rev.reverse()
+        l = self.get_chinese_text_length()
+        index = l - 1 - age;
 
-        if safe:
-            if age > len(rev) - 1:
-                return rev[-1]
+        if safe and index < 0:
+            index = 0
 
-        return rev[age]
+        return self.data["chinese_text"][index]
 
 
 class CONFIG:
@@ -87,7 +86,7 @@ class CONFIG:
 
 class STATE:
     app = Flask(__name__)
-    wg = None 
+    wg = None
     project = None
 
 @STATE.app.route("/get_started")
