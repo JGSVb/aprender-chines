@@ -60,11 +60,14 @@ function setText(elem, text){
 
 var _fetchTexts = setInterval(async function() {
 
-	var text = await fetch("fetch_chinese").then(response => response.text());
+	var text = await fetch("fetch_chinese?age=0").then(response => response.text());
 
 	if(text == chineseText) {
 		return;
 	}
+
+	var textolder = await fetch("fetch_chinese?age=1").then(response => response.text());
+	document.getElementById("chinesePreviousText").innerHTML = textolder;
 
 
 	chineseText = text;
@@ -76,11 +79,12 @@ var _fetchTexts = setInterval(async function() {
 	var pinyinDiv = document.getElementById("pinyinTextWords");
 	pinyinDiv.innerHTML = "";
 
-	chineseWords.forEach(async w => {
+	for(const w of chineseWords){
 		chineseDiv.innerHTML += "<div>" + w + "</div>";
+
 		var p = await fetch("pinyin?chinese=" + w).then(response => response.text());
 		pinyinDiv.innerHTML += "<div>" + p + "</div>";
-	});
+	}
 
 }, 700);
 
@@ -158,7 +162,7 @@ function getSelectedTextWithinDiv(parentDivId) {
 
 document.onselectionchange = () => {
 
-	var selection = getSelectedTextWithinDiv("chineseTextWords");
+	var selection = getSelectedTextWithinDiv("chineseTextWords") + getSelectedTextWithinDiv("chinesePreviousText");
 
 	if(selection.length == 0) {
 		return;

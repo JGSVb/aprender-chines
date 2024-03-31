@@ -1,6 +1,7 @@
 import os
 import pinyin
 import jieba
+import json
 from flask import Flask, render_template, request, jsonify, Response, redirect
 
 """
@@ -14,16 +15,80 @@ from utils import *
 
 _v = verbose
 
+class Project:
+    instances = {}
+
+    def __new__(cls, name):
+        if name in cls.instances:
+            return cls.instances[name]
+        else:
+            i = super().__new__(cls)
+            cls.instances[name] = i
+            return i
+
+    def __del__(self):
+        del Project.instances[self.name]
+
+    def __init__(self, name):
+        self.name = name
+        self.anki_filepath = os.path.join(CONFIG.project_folder, name + ".txt")
+        self.anki_file = AnkiFile.from_filepath(self.anki_filepath)
+
+        self.json_filepath = os.path.join(CONFIG.project_folder, name + ".json")
+        self.data = {
+                "chinese_text":[]
+                }
+        self.read()
+
+    def add_card(self, a,b,c,d, write = True):
+        return self.anki_file.add_card(a,b,c,d,write)
+
+    def write(self):
+        with open(self.json_filepath, "w") as f:
+            json.dump(self.data, f)
+
+    def read(self):
+        if not os.path.exists(self.json_filepath):
+            self.write()
+            return
+
+        with open(self.json_filepath, "r") as f:
+            self.data = json.load(f)
+
+    def append_chinese_text(self, text, write = True):
+        if(not self.data["chinese_text"]):
+            self.data["chinese_text"].append(text)
+        elif(self.data["chinese_text"][-1] != text):
+            self.data["chinese_text"].append(text)
+
+        if write:
+            self.write()
+
+    def get_chinese_text_length(self):
+        return len(self.data["chinese_text"])
+
+    def get_chinese_text(self, age, safe = True):
+        if not self.data["chinese_text"]:
+            return ""
+
+        rev = self.data["chinese_text"].copy()
+        rev.reverse()
+
+        if safe:
+            if age > len(rev) - 1:
+                return rev[-1]
+
+        return rev[age]
+
+
 class CONFIG:
     target_dir = os.path.join(os.path.dirname(__file__), "target")
-    anki_dir = os.path.join(os.path.dirname(__file__), "anki_coll")
+    project_folder = os.path.join(os.path.dirname(__file__), "projects")
 
 class STATE:
     app = Flask(__name__)
-    wg = Watchdog(CONFIG.target_dir)
-    project_name = None
-    anki_file = None
-    anki_filepath = None
+    wg = None 
+    project = None
 
 @STATE.app.route("/get_started")
 def get_started_page():
@@ -31,22 +96,27 @@ def get_started_page():
 
 @STATE.app.route("/")
 def main_page():
-    video_id = request.args.get("video_id")
+    video_url = request.args.get("video_url")
     project_name = request.args.get("project_name")
 
-    if not video_id or not project_name:
+    if not video_url or not project_name:
         return redirect("/get_started")
 
-    STATE.project_name = project_name
-    STATE.anki_filepath = os.path.join(CONFIG.anki_dir, STATE.project_name + ".txt")
-    STATE.anki_file = AnkiFile.by_filepath(STATE.anki_filepath)
+    STATE.project = Project(project_name)
+    STATE.wg = Watchdog(CONFIG.target_dir)
 
-    return render_template("main.html", video_id = video_id, project_name = project_name)
+    return render_template("main.html", video_url = video_url, project_name = project_name)
 
 @STATE.app.get("/fetch_chinese")
 def fetch_chinese():
-    STATE.wg.fetch_once()
-    return STATE.wg.chinese if STATE.wg.chinese else ""
+    age = request.args.get("age")
+    age = int(age)
+
+    if STATE.wg.fetch_once():
+        print(STATE.wg.chinese)
+        STATE.project.append_chinese_text(STATE.wg.chinese)
+
+    return STATE.project.get_chinese_text(age)
 
 @STATE.app.get("/pinyin")
 def pinyin_():
@@ -81,7 +151,7 @@ def anki_routine():
     if None in (question_a, question_b, awnser, meaning):
         return "Faltam campos"
 
-    STATE.anki_file.add_card(question_a, question_b, awnser, meaning, write = True)
+    STATE.project.add_card(question_a, question_b, awnser, meaning)
     return ""
 
 
@@ -93,13 +163,9 @@ def clean():
 
 def main():
     _v(os.makedirs)(CONFIG.target_dir, exist_ok=True)
-    _v(os.makedirs)(CONFIG.anki_dir, exist_ok=True)
+    _v(os.makedirs)(CONFIG.project_folder, exist_ok=True)
 
-    print("""Temporariamente desativado: """
-    """
     clean()
-    """
-    )
 
     STATE.app.run(debug=True)
 

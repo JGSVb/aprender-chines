@@ -169,6 +169,7 @@ input {
 
 .textWords {
 	display: flex;
+	flex-flow: row;
 }
 
 .textWords div {
@@ -189,4 +190,16 @@ input {
 	display: flex;
 	flex-flow: column;
 	align-items: center;
+}
+
+.chineseBox {
+	margin-top: -20px;
+	display: flex;
+	flex-flow: row;
+	align-items: center;
+}
+
+#chinesePreviousText {
+	color: rgba(50,50,50,0.7);
+	font-size: 20px;
 }

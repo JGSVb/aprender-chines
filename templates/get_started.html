@@ -5,14 +5,14 @@
 	</head>
 	<script>
 		function getStarted(){
-			var videoId = document.getElementById("videoIdInput").value;
+			var videoURL = document.getElementById("videoURLInput").value;
 			var projectName = document.getElementById("projectNameInput").value;
-			location.href = "/?video_id=" + videoId + "&project_name=" + projectName;
+			location.href = "/?video_url=" + videoURL + "&project_name=" + projectName;
 		}
 	</script>
 	<body>
 		<div class="box" id="getStartedBox">
-			<input type="text" id="videoIdInput" placeholder="URL do vídeo youtube"></input>
+			<input type="text" id="videoURLInput" placeholder="URL do vídeo youtube"></input>
 			<input type="text" id="projectNameInput" placeholder="Nome do Projeto"></input>
 			<button onclick="getStarted()">Começar</button>
 		</div>

@@ -11,14 +11,13 @@ class Watchdog:
     def __init__(self, target_dir):
         self.target_dir = target_dir
         self.before = []
-        self.actual= []
-        self.reader = easyocr.Reader(['ch_sim',])
+        self.actual = []
+        self.queue = []
+        self.reader = easyocr.Reader(["ch_sim", "en"])
 
-        self.has_content = False
         self.chinese = None
 
-    def fetch_once(self):
-
+    def build_queue(self):
         self.actual = os.listdir(self.target_dir)
 
         diff = [x for x in self.actual if x not in self.before]
@@ -27,17 +26,27 @@ class Watchdog:
 
         self.before = self.actual
 
-        if not diff:
-            return
+        self.queue = diff
+        self.queue.sort()
 
-        f = diff[-1]
+    def fetch_once(self) -> bool:
+
+        if not self.queue:
+            self.build_queue()
+
+            if not self.queue:
+                return False
+
+        f = self.queue[0]
+        self.queue.remove(f)
 
         result = self.reader.readtext(f, detail = 0)
         result = "".join(result)
         result = result.replace(" ", "")
 
         self.chinese = result
-        self.has_content = True
+
+        return True
 
 
 @lru_cache()
@@ -86,7 +95,7 @@ class AnkiFile:
     instances = []
 
     @classmethod
-    def get_instance_by_filepath(cls, filepath):
+    def get_instance_from_filepath(cls, filepath):
         for i in cls.instances:
             if i.filepath == filepath:
                 return i
@@ -95,7 +104,7 @@ class AnkiFile:
 
     @classmethod
     def register(cls, self):
-        if(cls.get_instance_by_filepath(self.filepath)):
+        if(cls.get_instance_from_filepath(self.filepath)):
             raise Exception("Já existe uma instância cujo filepath é " + self.filepath)
 
         cls.instances.append(self)
@@ -105,10 +114,10 @@ class AnkiFile:
         cls.instances.remove(self)
 
     @classmethod
-    def by_filepath(cls, filepath):
+    def from_filepath(cls, filepath):
         filepath = os.path.abspath(filepath)
 
-        i = cls.get_instance_by_filepath(filepath)
+        i = cls.get_instance_from_filepath(filepath)
 
         if(i):
             return i
@@ -179,7 +188,7 @@ class AnkiFile:
 
     def read(self):
         if not os.path.exists(self.filepath):
-            open(self.filepath, "w+").close()
+            self.write()
             return
 
         lines = []

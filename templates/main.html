@@ -41,18 +41,23 @@
 
 	<div class="box" id="infoBox">
 		<h2>{{project_name}}</h2>
-		<h2>{{video_id}}</h2>
+		<h2>{{video_url}}</h2>
 	</div>
 
 	<div class="box" id="embed-box">
-	<iframe class="embed" src="https://www.youtube.com/embed/{{video_id}}"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+	<iframe class="embed" src="{{video_url}}" accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 	</div>
 
 	<div class="box" id="custom-box">
 		<div class="custom">
 			<div class="chineseOrPinyinBox">
-				<div class="textWords" id="chineseTextWords"></div>
-				<button onclick="copyChineseText()">Copiar</button>
+				<div>
+					<div id="chinesePreviousText">ewrewr</div>
+					<div class="chineseBox">
+						<div class="textWords" id="chineseTextWords"></div>
+						<button onclick="copyChineseText()">Copiar</button>
+					</div>
+				</div>
 			</div>
 			<div id="chineseOrPinyinBox">
 				<div class="textWords" id="pinyinTextWords"></div>
