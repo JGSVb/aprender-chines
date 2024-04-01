@@ -27,6 +27,9 @@
 </head>
 <body>
 
+	<div id="notificationBox">
+	</div>
+
 	<div id="overlay">
 	    <div id="dialog">
 		<h2>Criar Cartão Anki</h2>
@@ -35,7 +38,10 @@
 		<input type="text" id="questionB" placeholder="Pergunta B">
 		<input type="text" id="awnser" placeholder="Resposta">
 		<input type="text" id="meaning" placeholder="Significado">
-		<button onclick="submitAnkiCardButton()">Criar</button>
+		<div>
+			<button onclick="cancelAnki()">Cancelar</button>
+			<button onclick="submitAnkiCardButton()">Criar</button>
+		</div>
 	    </div>
 	</div>
 
@@ -52,14 +58,19 @@
 		<div class="custom">
 			<div class="chineseOrPinyinBox">
 				<div>
-					<div id="chinesePreviousText">ewrewr</div>
+					<div class="dropdown">
+						<button onclick="dropdownButtonOnClick()" class="dropbtn">Navegar</button>
+						<div id="chineseOlderTexts" class="dropdown-content">
+						</div>
+					</div>
+
 					<div class="chineseBox">
 						<div class="textWords" id="chineseTextWords"></div>
 						<button onclick="copyChineseText()">Copiar</button>
 					</div>
 				</div>
 			</div>
-			<div id="chineseOrPinyinBox">
+			<div class="chineseOrPinyinBox">
 				<div class="textWords" id="pinyinTextWords"></div>
 			</div>
 		</div>

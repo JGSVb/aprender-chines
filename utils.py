@@ -17,6 +17,10 @@ class Watchdog:
 
         self.chinese = None
 
+    @lru_cache()
+    def cached_reader(self, *args, **kwargs):
+        return self.reader.readtext(*args, **kwargs)
+
     def build_queue(self):
         self.actual = os.listdir(self.target_dir)
 
@@ -40,7 +44,7 @@ class Watchdog:
         f = self.queue[0]
         self.queue.remove(f)
 
-        result = self.reader.readtext(f, detail = 0)
+        result = self.cached_reader(f, detail = 0)
         result = "".join(result)
         result = result.replace(" ", "")
 
@@ -89,51 +93,26 @@ def verbose(f):
 
     return inner
 
-
 class AnkiFile:
+    instances = {}
 
-    instances = []
-
-    @classmethod
-    def get_instance_from_filepath(cls, filepath):
-        for i in cls.instances:
-            if i.filepath == filepath:
-                return i
-
-        return None
-
-    @classmethod
-    def register(cls, self):
-        if(cls.get_instance_from_filepath(self.filepath)):
-            raise Exception("Já existe uma instância cujo filepath é " + self.filepath)
-
-        cls.instances.append(self)
-
-    @classmethod
-    def unregister(cls, self):
-        cls.instances.remove(self)
-
-    @classmethod
-    def from_filepath(cls, filepath):
-        filepath = os.path.abspath(filepath)
-
-        i = cls.get_instance_from_filepath(filepath)
-
-        if(i):
-            return i
+    def __new__(cls, filepath):
+        if filepath in cls.instances.keys():
+            return cls.instances[filepath]
         else:
-            return AnkiFile(filepath)
+            i = super().__new__(cls)
+            cls.instances[filepath] = i
+            return i
+
+    def __del__(self):
+        del AnkiFile.instances[self.filepath]
 
     def __init__(self, filepath):
         filepath = os.path.abspath(filepath)
         self.filepath = filepath
-        AnkiFile.register(self)
 
         self.cards = []
         self.read()
-
-    def __del__(self):
-        AnkiFile.unregister(self)
 
     @staticmethod
     def prop_get_name(line):
@@ -185,6 +164,13 @@ class AnkiFile:
 
         return False
 
+    def get_cards_field(self, index):
+        field = []
+
+        for c in self.cards:
+            field.append(c[index])
+
+        return field
 
     def read(self):
         if not os.path.exists(self.filepath):
@@ -230,7 +216,11 @@ class AnkiFile:
         return lines
 
     def add_card(self, a,b,c,d, write = False):
-        self.cards.append([a,b,c,d])
+        f = self.get_cards_field(0)
+        if a in f:
+            raise Exception("Já existe uma carta cujo index=0 tem valor " + a)
+        else:
+            self.cards.append([a,b,c,d])
 
         if(write):
             self.write()

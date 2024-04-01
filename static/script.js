@@ -14,6 +14,38 @@ var pinyinText = "";
 var chineseSegment = "";
 
 var dictionary = [];
+// melhorar a sincronia do dicionário
+var selectionId = 0;
+
+const TYPE_GOOD = "Good";
+const TYPE_BAD = "Bad";
+
+function pushNotification(text, type){
+	const nBox = document.getElementById("notificationBox");
+	const nElem = document.createElement("div");
+	nElem.className = "notification" + type;
+	nElem.innerHTML = text;
+
+	nBox.appendChild(nElem);
+	nElem.style.opacity = "0.9";
+
+	return nElem
+}
+
+function popNotification(elem){
+	elem.style.opacity = "0";
+
+	setTimeout(function(){
+		elem.remove();
+	}, 1000);
+}
+
+function sendNotification(text, type){
+	const nElem = pushNotification(text, type);
+	setTimeout(function(){
+		popNotification(nElem);
+	}, 5000);
+}
 
 
 async function retrieveData(url) {
@@ -67,8 +99,6 @@ var _fetchTexts = setInterval(async function() {
 	}
 
 	var textolder = await fetch("fetch_chinese?age=1").then(response => response.text());
-	document.getElementById("chinesePreviousText").innerHTML = textolder;
-
 
 	chineseText = text;
 
@@ -112,9 +142,32 @@ function collapsible(coll){
 	});
 }
 
-async function updateDictionary() {
+function getSelectedTextWithinDiv(parentDivId) {
+        let selectedText = "";
+        const parentDiv = document.getElementById(parentDivId);
+        const selection = window.getSelection();
+
+        if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const container = document.createElement("div");
+
+                // Check if the selection is within the parentDiv
+                if (parentDiv.contains(range.commonAncestorContainer)) {
+                        container.appendChild(range.cloneContents());
+                        selectedText = container.innerText; // Use innerText to get plain text
+                }
+        }
+
+        return selectedText;
+}
+
+async function updateDictionary(selId) {
 	const data = await fetch("dictionary?query=" + chineseSegment).then(response => response.json());
 	if(data.length == 0) { return; }
+
+	if(selId != selectionId){
+		return;
+	}
 
 	dictionary = data;
 
@@ -140,29 +193,12 @@ async function updateDictionary() {
 	});
 }
 
-function getSelectedTextWithinDiv(parentDivId) {
-        let selectedText = "";
-        const parentDiv = document.getElementById(parentDivId);
-        const selection = window.getSelection();
-
-        if (selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                const container = document.createElement("div");
-
-                // Check if the selection is within the parentDiv
-                if (parentDiv.contains(range.commonAncestorContainer)) {
-                        container.appendChild(range.cloneContents());
-                        selectedText = container.innerText; // Use innerText to get plain text
-                }
-        }
-
-        return selectedText;
-}
-
 
 document.onselectionchange = () => {
 
-	var selection = getSelectedTextWithinDiv("chineseTextWords") + getSelectedTextWithinDiv("chinesePreviousText");
+	selectionId++;
+
+	var selection = getSelectedTextWithinDiv("chineseTextWords");
 
 	if(selection.length == 0) {
 		return;
@@ -171,7 +207,7 @@ document.onselectionchange = () => {
 	chineseSegment = selection;
 	document.getElementById("preview").textContent = chineseSegment;
 
-	updateDictionary();
+	updateDictionary(selectionId);
 };
 
 function dictionaryEntrySelectorChanged(){
@@ -182,12 +218,34 @@ function dictionaryEntrySelectorChanged(){
 	var questionB = document.getElementById("questionB");
 	var meaning = document.getElementById("meaning");
 
-	questionA.value = dictionary[index].simplified;
-	questionB.value = dictionary[index].pinyin;
-	meaning.value = dictionary[index].portuguese;
+	if(index == -1){
+		questionA.value = chineseSegment;
+
+		questionB.placeholder = "Atualizando pinyin...";
+		questionB.value = "";
+		fetch("/pinyin?chinese="+chineseSegment)
+			.then(response => { return response.text();})
+			.then(t => {
+				questionB.value = t;
+				questionB.placeholder = "Pergunta B";
+			});
+
+		meaning.placeholder = "Traduzindo...";
+		meaning.value = "";
+		fetch("/translate?way=zh-CN,pt&text="+chineseSegment)
+			.then(response => { return response.text();})
+			.then(t => {
+				meaning.value = t;
+				meaning.placeholder = "Significado";
+			});
+	} else {
+		questionA.value = dictionary[index].simplified;
+		questionB.value = dictionary[index].pinyin;
+		meaning.value = dictionary[index].portuguese;
+	}
 }
 
-function createAnkiCardButton(){
+async function createAnkiCardButton(){
 	var overlay = document.getElementById("overlay");
 	overlay.style.display = "flex";
 
@@ -215,6 +273,23 @@ function createAnkiCardButton(){
 		selector.appendChild(clone);
 	});
 
+	var shouldAddSegment = true;
+
+	for(const e of dictionary){
+		if(e.simplified == chineseSegment || e.traditional == chineseSegment){
+			shouldAddSegment = false;
+		}
+	}
+
+	if(shouldAddSegment){
+		const clone = document.importNode(optionTemplate.content, true);
+		const real = clone.getElementById("realOption");
+		real.innerHTML = chineseSegment;
+		real.innerHTML += ", " + await fetch("/pinyin?chinese=" + chineseSegment).then(response => {return response.text()});
+		real.value = -1;
+		selector.appendChild(real);
+	}
+
 	var awnser = document.getElementById("awnser");
 	awnser.value = chineseText;
 
@@ -222,16 +297,70 @@ function createAnkiCardButton(){
 	dictionaryEntrySelectorChanged();
 }
 
-async function submitAnkiCardButton(){
+function submitAnkiCardButton(){
 	var questionA = document.getElementById("questionA").value;
 	var questionB = document.getElementById("questionB").value;
 	var awnser = document.getElementById("awnser").value;
 	var meaning = document.getElementById("meaning").value;
 
-	await fetch("anki_routine?question_a=" 	+ questionA +
+	fetch("anki_routine?question_a=" 	+ questionA +
 				"&question_b=" 	+ questionB +
 				"&awnser=" 	+ awnser +
-				"&meaning=" 	+ meaning);
+				"&meaning=" 	+ meaning)
+		.then(response => {return response.text()})
+		.then(text => {
+			if(!text){
+				sendNotification("Carta adicionada com sucesso", TYPE_GOOD);
+			} else {
+				sendNotification(text, TYPE_BAD);
+			}
+		});
 
 	overlay.style.display = "none";
+}
+
+function cancelAnki() {
+	overlay.style.display = "none";
+}
+
+async function populateDropdown() {
+	const container = document.getElementById("chineseOlderTexts");
+	container.innerHTML = "";
+
+	const textList = await fetch("/fetch_chinese")
+		.then(response => {
+			return response.json();
+		})
+		.then(t => {
+			return t;
+		});
+
+	for(var e of textList){
+		const c = document.createElement("div");
+		c.innerHTML = e;
+		container.appendChild(c);
+	}
+}
+
+function dropdownButtonOnClick() {
+	const elem = document.getElementById("chineseOlderTexts");
+	elem.classList.toggle("show");
+
+	if(elem.classList.contains("show")){
+		populateDropdown();
+	}
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
 }

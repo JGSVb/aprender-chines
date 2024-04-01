@@ -18,7 +18,7 @@ _v = verbose
 class Project:
     instances = {}
 
-    def __new__(cls, name):
+    def __new__(cls, name, *args, **kwargs):
         if name in cls.instances:
             return cls.instances[name]
         else:
@@ -29,14 +29,16 @@ class Project:
     def __del__(self):
         del Project.instances[self.name]
 
-    def __init__(self, name):
+    def __init__(self, name, video_url):
         self.name = name
         self.anki_filepath = os.path.join(CONFIG.project_folder, name + ".txt")
-        self.anki_file = AnkiFile.from_filepath(self.anki_filepath)
+        self.anki_file = AnkiFile(self.anki_filepath)
 
         self.json_filepath = os.path.join(CONFIG.project_folder, name + ".json")
         self.data = {
-                "chinese_text":[]
+                "chinese_text":[],
+                "project_name":name,
+                "video_url":video_url,
                 }
         self.read()
 
@@ -79,6 +81,12 @@ class Project:
 
         return self.data["chinese_text"][index]
 
+    def copy_chinese_text_list(self, rev = True):
+        c = self.data["chinese_text"].copy()
+        if rev:
+            c.reverse()
+        return c
+
 
 class CONFIG:
     target_dir = os.path.join(os.path.dirname(__file__), "target")
@@ -88,6 +96,10 @@ class STATE:
     app = Flask(__name__)
     wg = None
     project = None
+
+def fetch_once():
+    if STATE.wg.fetch_once():
+        STATE.project.append_chinese_text(STATE.wg.chinese)
 
 @STATE.app.route("/get_started")
 def get_started_page():
@@ -101,19 +113,22 @@ def main_page():
     if not video_url or not project_name:
         return redirect("/get_started")
 
-    STATE.project = Project(project_name)
-    STATE.wg = Watchdog(CONFIG.target_dir)
+    if not STATE.project or project_name != STATE.project.name:
+        STATE.project = Project(project_name, video_url)
+        STATE.wg = Watchdog(CONFIG.target_dir)
 
     return render_template("main.html", video_url = video_url, project_name = project_name)
 
 @STATE.app.get("/fetch_chinese")
 def fetch_chinese():
     age = request.args.get("age")
-    age = int(age)
 
-    if STATE.wg.fetch_once():
-        print(STATE.wg.chinese)
-        STATE.project.append_chinese_text(STATE.wg.chinese)
+    fetch_once();
+
+    if not age:
+        return jsonify(STATE.project.copy_chinese_text_list())
+
+    age = int(age)
 
     return STATE.project.get_chinese_text(age)
 
@@ -150,7 +165,10 @@ def anki_routine():
     if None in (question_a, question_b, awnser, meaning):
         return "Faltam campos"
 
-    STATE.project.add_card(question_a, question_b, awnser, meaning)
+    try:
+        STATE.project.add_card(question_a, question_b, awnser, meaning)
+    except Exception as e:
+        return str(e)
     return ""
 
 
