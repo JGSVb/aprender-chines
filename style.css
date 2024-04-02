@@ -1,4 +1,10 @@
-/*:root {
+/* TODO: trocar white, black por cores mais neutras 
+ * tipo black passa pra um roxo escuro 
+ * e    white passa pra um amarelo*/
+
+/* Tema claro */
+/*
+:root {
 	--mainbg: white;
 	--mainfg: rgb(50,50,50);
 	--dialogbg: white;
@@ -13,15 +19,16 @@
 	--notificationbgbad: rgb(150, 70, 50);
 }*/
 
+/* Tema escuro */
 :root {
-	--mainbg: rgb(50,50,50);
-	--mainfg: white;
+	--mainbg: rgb(20,20,20);
+	--mainfg: #F8EFBA;
 	--dialogbg: rgb(50, 50, 50);
-	--buttonfg: white;
+	--buttonfg: #F8EFBA;
 	--bordercol: rgb(152, 153, 153);
-	--buttonbg: rgb(127, 127, 127);
+	--buttonbg: #485460;
 	--buttonactive: rgb(0,0,255);
-	--linkfg: rgb(30, 80, 160);
+	--linkfg: #4bcffa;
 	--notificationbordergood: 2px solid rgb(20, 100, 50);
 	--notificationbggood: rgb(50, 150, 70);
 	--notificationborderbad: 2px solid rgb(100, 50, 20);
@@ -70,7 +77,7 @@ body {
 
 button {
 	border-radius: 10px;
-	background-color: rgb(127,127,127);
+	background-color: var(--buttonbg);
 	color: var(--buttonfg);
 	font-family: arial;
 	font-weight: bold;
@@ -156,6 +163,7 @@ button:active {
     display: none;
     justify-content: center;
     align-items: center;
+    z-index: 1;
 }
 
 #dialog {
