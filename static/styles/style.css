@@ -1,3 +1,40 @@
+/* TODO: trocar white, black por cores mais neutras 
+ * tipo black passa pra um roxo escuro 
+ * e    white passa pra um amarelo*/
+
+/* Tema claro */
+/*
+:root {
+	--mainbg: white;
+	--mainfg: rgb(50,50,50);
+	--dialogbg: white;
+	--buttonfg: white;
+	--bordercol: rgb(152, 153, 153);
+	--buttonbg: rgb(127, 127, 127);
+	--buttonactive: rgb(0,0,255);
+	--linkfg: rgb(30, 80, 160);
+	--notificationbordergood: 2px solid rgb(20, 100, 50);
+	--notificationbggood: rgb(50, 150, 70);
+	--notificationborderbad: 2px solid rgb(100, 50, 20);
+	--notificationbgbad: rgb(150, 70, 50);
+}*/
+
+/* Tema escuro */
+:root {
+	--mainbg: rgb(20,20,20);
+	--mainfg: #F8EFBA;
+	--dialogbg: rgb(50, 50, 50);
+	--buttonfg: #F8EFBA;
+	--bordercol: rgb(152, 153, 153);
+	--buttonbg: #485460;
+	--buttonactive: rgb(0,0,255);
+	--linkfg: #4bcffa;
+	--notificationbordergood: 2px solid rgb(20, 100, 50);
+	--notificationbggood: rgb(50, 150, 70);
+	--notificationborderbad: 2px solid rgb(100, 50, 20);
+	--notificationbgbad: rgb(150, 70, 50);
+}
+
 * {
 	margin: 0px;
 	padding: 0px;
@@ -7,16 +44,17 @@
 
 	font-size: 30px;
 	font-family: monospace;
-	color: rgb(50,50,50);
+	color: var(--mainfg);
 }
 
 body {
 	height: 100vh;
 	padding: 10px;
+	background-color: var(--mainbg);
 }
 
 .box {
-	border: 1px solid rgba(0,0,0,0.4);
+	border: 1px solid var(--bordercol);
 	border-radius: 10px;
 	padding: 20px;
 	margin-bottom: 15px;
@@ -39,8 +77,8 @@ body {
 
 button {
 	border-radius: 10px;
-	background-color: rgb(127,127,127);
-	color: white;
+	background-color: var(--buttonbg);
+	color: var(--buttonfg);
 	font-family: arial;
 	font-weight: bold;
 	text-shadow: 1px 2px 3px rgba(0,0,0,0.5);
@@ -54,7 +92,7 @@ button {
 }
 
 button:active {
-	background-color: blue;
+	background-color: var(--buttonactive);
 }
 
 .translator button {
@@ -81,7 +119,7 @@ button:active {
 	font-weight: normal;
 	margin-left: 10px;
 	font-size: 20px;
-	color: rgba(30, 80, 160, 1);
+	color: var(--linkfg);
 }
 
 .create-anki-card {
@@ -94,7 +132,7 @@ button:active {
 .dictionary-box {
 	margin: 10px;
 	padding: 10px;
-	border: solid rgb(50,50,50);
+	border: solid var(--mainfg);
 	border-width: 3px;
 	border-radius: 10px;
 }
@@ -125,10 +163,11 @@ button:active {
     display: none;
     justify-content: center;
     align-items: center;
+    z-index: 1;
 }
 
 #dialog {
-    background-color: white;
+    background-color: var(--dialogbg);
     padding: 20px;
     border-radius: 8px;
     text-align: center;
@@ -146,7 +185,7 @@ button:active {
 
 input {
 	background-color: transparent;
-	border: 2px solid rgba(0,0,0,0.5);
+	border: 1px solid var(--bordercol);
 	border-radius: 10px;
 	padding: 10px;
 	transition-duration: 0.2s;
@@ -155,7 +194,7 @@ input {
 
 #dialog select {
 	background-color: transparent;
-	border: 2px solid rgba(0,0,0,0.5);
+	border: 1px solid var(--bordercol);
 	border-radius: 10px;
 	padding: 10px;
 	transition-duration: 0.2s;
@@ -220,13 +259,13 @@ input {
 }
 
 .notificationGood {
-	border: 2px solid rgb(20, 100, 50);
-	background-color: rgb(50, 150, 70);
+	border: 2px solid var(--notificationbordergood);
+	background-color: var(--notificationbggood);
 }
 
 .notificationBad {
-	border: 2px solid rgb(100, 50, 20);
-	background-color: rgb(150, 70, 50);
+	border: 2px solid var(--notificationborderbad);
+	background-color: var(--notificationbgbad);
 }
 
 .dropdown {
@@ -241,12 +280,12 @@ input {
 	min-width: 500px;
 	overflow: auto;
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-	right: 0;
+	left: 0;
 	z-index: 1;
 	padding: 5px;
-	border: 1px solid rgba(0, 0, 0, 0.4);
+	border: 1px solid var(--bordercol);
 	border-radius: 10px;
-	background-color: white;
+	background-color: var(--mainbg);
 	max-height: 250px;
 }
 
@@ -258,7 +297,5 @@ input {
 	border-bottom: 1px solid black; /* Add a solid black border to the bottom of each div except the last one */
 	padding: 5px; /* Add some padding for better visualization */
 }
-
-.dropdown a:hover {background-color: #ddd;}
 
 .show {display: block;}
