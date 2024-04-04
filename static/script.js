@@ -17,6 +17,8 @@ var dictionary = [];
 // melhorar a sincronia do dicionário
 var selectionId = 0;
 
+var textEdition = false;
+
 const TYPE_GOOD = "Good";
 const TYPE_BAD = "Bad";
 
@@ -92,13 +94,13 @@ function setText(elem, text){
 
 var _fetchTexts = setInterval(async function() {
 
-	var text = await fetch("fetch_chinese?age=0").then(response => response.text());
+	var text = await fetch("fetch_chinese?index=-1").then(response => response.text());
 
 	if(text == chineseText) {
 		return;
 	}
 
-	var textolder = await fetch("fetch_chinese?age=1").then(response => response.text());
+	var textolder = await fetch("fetch_chinese?index=-2").then(response => response.text());
 
 	chineseText = text;
 
@@ -363,4 +365,44 @@ window.onclick = function(event) {
       }
     }
   }
+}
+
+var textEditionInput = document.getElementById("textEdition");
+var chineseTextWords = document.getElementById("chineseTextWords");
+var pinyinTextWords = document.getElementById("pinyinTextWords");
+var copyButton = document.getElementById("copyText");
+var submitButton = document.getElementById("submitText");
+
+function toggleTextEdition(){
+	if(textEdition) {
+		textEdition = false;
+		textEditionInput.style.display = "none";
+		chineseTextWords.style.display = "flex";
+		pinyinTextWords.style.display = "flex";
+		copyButton.style.display = "block";
+		submitButton.style.display = "none";
+	} else {
+		textEdition = true;
+		textEditionInput.style.display = "block";
+		chineseTextWords.style.display = "none";
+		pinyinTextWords.style.display = "none";
+		copyButton.style.display = "none";
+		submitButton.style.display = "block";
+
+		textEditionInput.value = chineseText;
+	}
+}
+
+function submitEdition(){
+	toggleTextEdition();
+
+	fetch("change_chinese?index=-1&new=" + textEditionInput.value)
+		.then(response => {return response.text()})
+		.then(text => {
+			if(!text){
+				sendNotification("Edição enviada com sucesso", TYPE_GOOD);
+			} else {
+				sendNotification(text, TYPE_BAD);
+			}
+		});
 }

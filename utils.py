@@ -1,11 +1,27 @@
 import os
 import easyocr
+import json
 from deep_translator import GoogleTranslator
 from parser import parsed_dict
 from functools import lru_cache
 from pinyin_tone_converter.pinyin_tone_converter import PinyinToneConverter
 
 translator = {}
+
+portuguese_dict = {}
+
+with open("dict.json") as f:
+    portuguese_dict = json.load(f)
+
+@lru_cache()
+def search_dict_portuguese(query):
+    entries = []
+
+    for e in portuguese_dict:
+        if e["simplified"] == query:
+            entries.append(e)
+
+    return entries
 
 class Watchdog:
     def __init__(self, target_dir):
@@ -64,6 +80,7 @@ def translate(text, source, target):
 
 @lru_cache()
 def get_dictionary_for(query):
+    # entries = search_dict_portuguese(query)
     entries = []
 
     for e in parsed_dict:

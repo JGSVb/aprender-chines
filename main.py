@@ -1,3 +1,4 @@
+# TODO: Integrar na classe project uma instância de Watchdog, tal como acontece com AnkiFile
 import os
 import pinyin
 import jieba
@@ -66,20 +67,18 @@ class Project:
         if write:
             self.write()
 
-    def get_chinese_text_length(self):
+    def get_chinese_text_count(self):
         return len(self.data["chinese_text"])
 
-    def get_chinese_text(self, age, safe = True):
-        if not self.data["chinese_text"] and safe:
-            return ""
-
-        l = self.get_chinese_text_length()
-        index = l - 1 - age;
-
-        if safe and index < 0:
-            index = 0
-
+    def get_chinese_text(self, index):
         return self.data["chinese_text"][index]
+
+    def change_chinese_text(self, index, new, write = True):
+
+        self.data["chinese_text"][index] = new
+
+        if write:
+            self.write()
 
     def copy_chinese_text_list(self, rev = True):
         c = self.data["chinese_text"].copy()
@@ -121,16 +120,34 @@ def main_page():
 
 @STATE.app.get("/fetch_chinese")
 def fetch_chinese():
-    age = request.args.get("age")
+    index = request.args.get("index")
 
     fetch_once();
 
-    if not age:
+    if not index:
         return jsonify(STATE.project.copy_chinese_text_list())
 
-    age = int(age)
+    index = int(index)
 
-    return STATE.project.get_chinese_text(age)
+    return STATE.project.get_chinese_text(index)
+
+@STATE.app.get("/change_chinese")
+def change_chinese():
+    index = request.args.get("index")
+    new = request.args.get("new")
+
+    try:
+        index = int(index)
+
+        if STATE.project.get_chinese_text(index) == new:
+            return "A alteração não foi feita pois os valores novos e antigos coicidem"
+
+        STATE.project.change_chinese_text(index, new)
+
+    except Exception as e:
+        return str(e)
+    else:
+        return ""
 
 @STATE.app.get("/pinyin")
 def pinyin_():

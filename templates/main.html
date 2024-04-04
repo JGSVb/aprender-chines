@@ -2,6 +2,8 @@
 <html>
 <head>
 	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+	<!-- Add icon library -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 	<template id="dictionaryTemplate">
 		<div class="dictionary-box">
@@ -66,7 +68,10 @@
 
 					<div class="chineseBox">
 						<div class="textWords" id="chineseTextWords"></div>
-						<button onclick="copyChineseText()">Copiar</button>
+						<input id="textEdition"></input>
+						<button onclick="toggleTextEdition()"><i class="fa fa-pencil"></i></button>
+						<button id="submitText" onclick="submitEdition()">Enviar</button>
+						<button id="copyText" onclick="copyChineseText()">Copiar</button>
 					</div>
 				</div>
 			</div>

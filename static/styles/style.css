@@ -299,3 +299,11 @@ input {
 }
 
 .show {display: block;}
+
+#textEdition {
+	display: none;
+}
+
+#submitText {
+	display: none;
+}
