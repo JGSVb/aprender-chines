@@ -248,8 +248,8 @@ function dictionaryEntrySelectorChanged(){
 }
 
 async function createAnkiCardButton(){
-	var overlay = document.getElementById("overlay");
-	overlay.style.display = "flex";
+	Overlay.setPurpose(PURPOSE_CREATECARD);
+	Overlay.setVisible(true);
 
 	var selector = document.getElementById("dictionaryEntrySelector");
 	selector.innerHTML = "";
@@ -318,11 +318,11 @@ function submitAnkiCardButton(){
 			}
 		});
 
-	overlay.style.display = "none";
+	Overlay.setVisible(false);
 }
 
 function cancelAnki() {
-	overlay.style.display = "none";
+	Overlay.setVisible(false);
 }
 
 async function populateDropdown() {

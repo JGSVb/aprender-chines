@@ -75,7 +75,7 @@ body {
 	display: block;
 }
 
-button {
+button:not(#closeOverlay) {
 	border-radius: 10px;
 	background-color: var(--buttonbg);
 	color: var(--buttonfg);
@@ -91,7 +91,7 @@ button {
 
 }
 
-button:active {
+button:active:not(#closeOverlay) {
 	background-color: var(--buttonactive);
 }
 
@@ -120,13 +120,6 @@ button:active {
 	margin-left: 10px;
 	font-size: 20px;
 	color: var(--linkfg);
-}
-
-.create-anki-card {
-	width: 100%;
-	margin: 0px;
-	margin-bottom: 10px;
-	margin-top: 10px;
 }
 
 .dictionary-box {
@@ -306,4 +299,58 @@ input {
 
 #submitText {
 	display: none;
+}
+
+#ankiButtonsBox {
+	display: flex;
+}
+
+#ankiButtonsBox * {
+	flex: 1;
+}
+
+#closeOverlay {
+	cursor: pointer;
+	color: red;
+	transform: scale(1.6);
+	background-color: transparent;
+}
+
+#overlayTopRightCorner {
+	width: 100%;
+	display: flex;
+	flex-direction: row-reverse;
+	padding: 0;
+	border: none;
+	margin: 0;
+}
+
+#ankiCardsDialog {
+	width: 100%;
+	margin: 0;
+}
+
+#ankiCardsContainer {
+	display: grid;
+	max-height: 500px;
+	overflow: scroll;
+	width: 100%;
+	grid-template-columns: 1fr 1fr 4fr 4fr auto;
+	text-align: left;
+	margin: 0;
+	border-radius: 10px;
+	box-shadow:
+		inset 0px 5px 0px rgba(255,255,255,0.1),
+		inset 0px -5px 0px rgba(255,255,255,0.1);
+}
+
+#ankiCardsContainer button {
+	width: fit-content;
+	height: fit-content;
+}
+
+#ankiCardsContainer div {
+	margin: 0;
+	padding: 3px;
+	border-bottom: 1px solid var(--bordercol);
 }

@@ -188,6 +188,10 @@ def anki_routine():
         return str(e)
     return ""
 
+@STATE.app.get("/cards")
+def get_cards():
+    return jsonify(STATE.project.anki_file.cards)
+
 
 def clean():
 
