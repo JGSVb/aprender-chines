@@ -159,7 +159,7 @@ button:active:not(#closeOverlay) {
     z-index: 1;
 }
 
-#dialog {
+#overlayDialog {
     background-color: var(--dialogbg);
     padding: 20px;
     border-radius: 8px;
@@ -172,7 +172,7 @@ button:active:not(#closeOverlay) {
     align-items: center;
 }
 
-#dialog * {
+#overlayDialog * {
 	margin: 10px;
 }
 
@@ -185,7 +185,7 @@ input {
 	width: 90%;
 }
 
-#dialog select {
+#overlayDialog select {
 	background-color: transparent;
 	border: 1px solid var(--bordercol);
 	border-radius: 10px;

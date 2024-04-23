@@ -32,13 +32,42 @@
 		<div id="example"></div>
 		<div id="meaning"></div>
 		<div>
-			<button id="delete">
+			<button id="deleteAnkiCard">
 				<i class="fa fa-trash"></i>
 			</button>
-			<button id="change">
+			<button id="modifyAnkiCard">
 				<i class="fa fa-pencil"></i>
 			</button>
 		</div>
+	</template>
+
+	<template id="createAnkiCardDialogTemplate">
+		<div id="createAnkiCardDialog">
+			<h2>Criar Cartão Anki</h2>
+			<select id="dictionaryEntrySelector" onchange="createAnkiCardDialog.dictionaryEntrySelectorChanged()"></select>
+			<input type="text" id="hanziInput" placeholder="汉字">
+			<input type="text" id="pinyinInput" placeholder="pīnyīn">
+			<input type="text" id="exampleInput" placeholder="Exemplo">
+			<input type="text" id="meaningInput" placeholder="Significado">
+			<button onclick="createAnkiCardDialog.submitAnkiCardButton()">Criar</button>
+		</div>
+	</template>
+
+	<template id="ankiCardsDialogTemplate">
+		<div id="ankiCardsDialog">
+			<div id="ankiCardsContainer">
+			</div>
+		</div>
+	</template>
+
+	<template id="deleteAnkiCardConfirmationTemplate">
+		<div>Tens a certeza de que pretendes deletar a seguinte carta?</div>
+		<div id="ankiCard"></div>
+		<div>
+			<button id="delete">Sim</button>
+			<button id="return">Voltar atrás</button>
+		</div>
+
 	</template>
 
 </head>
@@ -48,26 +77,11 @@
 	</div>
 
 	<div id="overlay">
-	    <div id="dialog">
-		<div id="overlayTopRightCorner">
-			<button id="closeOverlay" class="fa fa-xmark" onclick="Overlay.hide();"></button>
+	    <div id="overlayDialog">
+		<div id="overlayContent">
 		</div>
-		<div id="createAnkiCardDialog">
-			<h2>Criar Cartão Anki</h2>
-			<select id="dictionaryEntrySelector" onchange="dictionaryEntrySelectorChanged()"></select>
-			<input type="text" id="questionA" placeholder="Pergunta A">
-			<input type="text" id="questionB" placeholder="Pergunta B">
-			<input type="text" id="awnser" placeholder="Resposta">
-			<input type="text" id="meaning" placeholder="Significado">
-			<div>
-				<button onclick="cancelAnki()">Cancelar</button>
-				<button onclick="submitAnkiCardButton()">Criar</button>
-			</div>
-		</div>
-		<div id="ankiCardsDialog">
-			<div id="ankiCardsContainer">
-			</div>
-		</div>
+
+		<button onclick="Overlay.hide()">Fechar</button>
 	    </div>
 	</div>
 
@@ -117,12 +131,13 @@
 	<div class="box" id="dictionaryContainer"></div>
 
 	<div class="box" id="ankiButtonsBox">
-		<button onclick="createAnkiCardButton()" class="create-anki-card">Criar cartão anki</button>
+		<button onclick="createAnkiCardDialog.show()" class="create-anki-card">Criar cartão anki</button>
 		<button onclick="ShowAnkiCardsDialog.show()" id="showAnkiCardsButton">Listar cartões</button>
 	</div>
 
 	<script src="{{url_for('static', filename='overlay.js')}}"></script>
 	<script src="{{url_for('static', filename='script.js')}}"></script>
+	<script src="{{url_for('static', filename='createAnkiCardDialog.js')}}"></script>
 	<script src="{{url_for('static', filename='showAnkiCardsButton.js')}}"></script>
 
 </body>
