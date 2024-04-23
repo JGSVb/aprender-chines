@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+	<!-- Add icon library -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+	<template id="dictionaryTemplate">
+		<div class="dictionary-box">
+
+			<button type="button" class="collapsible" id="dictionaryEntryName"></button>
+
+			<div class="collapsible-content">
+				<div>
+					<text id="dictionaryPinyin" class="dictionary-field"></text>
+				</div>
+				<div>
+					<text id="dictionaryPortuguese" class="dictionary-field"></text>
+				</div>
+			</div>
+		</div>
+	</template>
+
+	<template id="optionTemplate">
+		<option id="realOption"></option>
+        	<option id="fakeOption" disabled style="font-style:italic"></option>
+	</template>
+
+	<template id="ankiCardEntryTemplate">
+		<div id="hanzi"></div>
+		<div id="pinyin"></div>
+		<div id="example"></div>
+		<div id="meaning"></div>
+		<div>
+			<button id="deleteAnkiCard">
+				<i class="fa fa-trash"></i>
+			</button>
+			<button id="modifyAnkiCard">
+				<i class="fa fa-pencil"></i>
+			</button>
+		</div>
+	</template>
+
+	<template id="createAnkiCardDialogTemplate">
+		<div id="createAnkiCardDialog">
+			<h2>Criar Cartão Anki</h2>
+			<select id="dictionaryEntrySelector" onchange="createAnkiCardDialog.dictionaryEntrySelectorChanged()"></select>
+			<input type="text" id="hanziInput" placeholder="汉字">
+			<input type="text" id="pinyinInput" placeholder="pīnyīn">
+			<input type="text" id="exampleInput" placeholder="Exemplo">
+			<input type="text" id="meaningInput" placeholder="Significado">
+			<button onclick="createAnkiCardDialog.submitAnkiCardButton()">Criar</button>
+		</div>
+	</template>
+
+	<template id="ankiCardsDialogTemplate">
+		<div id="ankiCardsDialog">
+			<div id="ankiCardsContainer">
+			</div>
+		</div>
+	</template>
+
+	<template id="deleteAnkiCardConfirmationTemplate">
+		<div>Tens a certeza de que pretendes deletar a seguinte carta?</div>
+		<div id="ankiCard"></div>
+		<div>
+			<button id="delete">Sim</button>
+			<button id="return">Voltar atrás</button>
+		</div>
+
+	</template>
+
+</head>
+<body>
+
+	<div id="notificationBox">
+	</div>
+
+	<div id="overlay">
+	    <div id="overlayDialog">
+		<div id="overlayContent">
+		</div>
+
+		<button onclick="Overlay.hide()">Fechar</button>
+	    </div>
+	</div>
+
+	<div class="box" id="infoBox">
+		<h2>{{project_name}}</h2>
+		<h2>{{video_url}}</h2>
+	</div>
+
+	<div class="box" id="embed-box">
+	<iframe class="embed" src="{{video_url}}" accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+	</div>
+
+	<div class="box" id="custom-box">
+		<div class="custom">
+			<div class="chineseOrPinyinBox">
+				<div>
+					<div class="dropdown">
+						<button onclick="dropdownButtonOnClick()" class="dropbtn">Navegar</button>
+						<div id="chineseOlderTexts" class="dropdown-content">
+						</div>
+					</div>
+
+					<div class="chineseBox">
+						<div class="textWords" id="chineseTextWords"></div>
+						<input id="textEdition"></input>
+						<button onclick="toggleTextEdition()"><i class="fa fa-pencil"></i></button>
+						<button id="submitText" onclick="submitEdition()">Enviar</button>
+						<button id="copyText" onclick="copyChineseText()">Copiar</button>
+					</div>
+				</div>
+			</div>
+			<div class="chineseOrPinyinBox">
+				<div class="textWords" id="pinyinTextWords"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="box" id="translator-box">
+		<div class="translator">
+			<button onclick="fetchTranslation()">Traduzir</button>
+			<div><div class="tt">Frase (EN)</div><text id="translate-zh-en"></text></div>
+			<div><div class="tt" id="ttcnen">Seleção (EN)<text class="preview" id="preview"></text></div><text id="translate-zh-en2"></text></div>
+			<div><div class="tt">Seleção (PT)</div><text id="translate-en-pt"></text></div>
+		</div>
+	</div>
+
+	<div class="box" id="dictionaryContainer"></div>
+
+	<div class="box" id="ankiButtonsBox">
+		<button onclick="createAnkiCardDialog.show()" class="create-anki-card">Criar cartão anki</button>
+		<button onclick="ShowAnkiCardsDialog.show()" id="showAnkiCardsButton">Listar cartões</button>
+	</div>
+
+	<script src="{{url_for('static', filename='overlay.js')}}"></script>
+	<script src="{{url_for('static', filename='script.js')}}"></script>
+	<script src="{{url_for('static', filename='createAnkiCardDialog.js')}}"></script>
+	<script src="{{url_for('static', filename='showAnkiCardsButton.js')}}"></script>
+
+</body>
+</html>

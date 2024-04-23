@@ -1,0 +1,356 @@
+/* TODO: trocar white, black por cores mais neutras 
+ * tipo black passa pra um roxo escuro 
+ * e    white passa pra um amarelo*/
+
+/* Tema claro */
+/*
+:root {
+	--mainbg: white;
+	--mainfg: rgb(50,50,50);
+	--dialogbg: white;
+	--buttonfg: white;
+	--bordercol: rgb(152, 153, 153);
+	--buttonbg: rgb(127, 127, 127);
+	--buttonactive: rgb(0,0,255);
+	--linkfg: rgb(30, 80, 160);
+	--notificationbordergood: 2px solid rgb(20, 100, 50);
+	--notificationbggood: rgb(50, 150, 70);
+	--notificationborderbad: 2px solid rgb(100, 50, 20);
+	--notificationbgbad: rgb(150, 70, 50);
+}*/
+
+/* Tema escuro */
+:root {
+	--mainbg: rgb(20,20,20);
+	--mainfg: #F8EFBA;
+	--dialogbg: rgb(50, 50, 50);
+	--buttonfg: #F8EFBA;
+	--bordercol: rgb(152, 153, 153);
+	--buttonbg: #485460;
+	--buttonactive: rgb(0,0,255);
+	--linkfg: #4bcffa;
+	--notificationbordergood: 2px solid rgb(20, 100, 50);
+	--notificationbggood: rgb(50, 150, 70);
+	--notificationborderbad: 2px solid rgb(100, 50, 20);
+	--notificationbgbad: rgb(150, 70, 50);
+}
+
+* {
+	margin: 0px;
+	padding: 0px;
+	spacing: 0px;
+	outline: none;
+	border: none;
+
+	font-size: 30px;
+	font-family: monospace;
+	color: var(--mainfg);
+}
+
+body {
+	height: 100vh;
+	padding: 10px;
+	background-color: var(--mainbg);
+}
+
+.box {
+	border: 1px solid var(--bordercol);
+	border-radius: 10px;
+	padding: 20px;
+	margin-bottom: 15px;
+
+}
+
+#embed-box {
+	height: 50%;
+}
+
+.embed {
+	width: 100%;
+	height: 100%;
+}
+
+#translator-box {
+	height: auto;
+	display: block;
+}
+
+button:not(#closeOverlay) {
+	border-radius: 10px;
+	background-color: var(--buttonbg);
+	color: var(--buttonfg);
+	font-family: arial;
+	font-weight: bold;
+	text-shadow: 1px 2px 3px rgba(0,0,0,0.5);
+	box-shadow: 4px 2px 10px rgba(0,0,0,0.2);
+	font-size: 30px;
+	padding: 10px;
+	transition-duration: 0.2s;
+	cursor: pointer;
+	margin: 10px;
+
+}
+
+button:active:not(#closeOverlay) {
+	background-color: var(--buttonactive);
+}
+
+.translator button {
+	width: 80%;
+	margin-left: 10%;
+}
+
+#custom-box {
+	height: auto;
+	display: block;
+}
+
+.tt {
+	font-weight: bold;
+	margin-right: 40px;
+}
+
+#ttcnen {
+	display: flex;
+	align-items: center;
+}
+
+.tt .preview {
+	font-weight: normal;
+	margin-left: 10px;
+	font-size: 20px;
+	color: var(--linkfg);
+}
+
+.dictionary-box {
+	margin: 10px;
+	padding: 10px;
+	border: solid var(--mainfg);
+	border-width: 3px;
+	border-radius: 10px;
+}
+
+.collapsible {
+	display: flex;
+	align-items: center;
+}
+
+.dict {
+	width: 100%;
+	height: 100%;
+}
+
+.collapsible-content {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.1s ease-out;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+#overlayDialog {
+    background-color: var(--dialogbg);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    width: 50%;
+
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#overlayDialog * {
+	margin: 10px;
+}
+
+input {
+	background-color: transparent;
+	border: 1px solid var(--bordercol);
+	border-radius: 10px;
+	padding: 10px;
+	transition-duration: 0.2s;
+	width: 90%;
+}
+
+#overlayDialog select {
+	background-color: transparent;
+	border: 1px solid var(--bordercol);
+	border-radius: 10px;
+	padding: 10px;
+	transition-duration: 0.2s;
+}
+
+
+.chineseOrPinyinBox {
+	display: flex;
+	align-items: center;
+}
+
+.textWords {
+	display: flex;
+	flex-flow: row;
+}
+
+.textWords div {
+	margin-right: 10px;
+}
+
+#getStartedBox {
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+}
+
+#getStartedBox * {
+	margin: 10px;
+}
+
+#infoBox {
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+}
+
+.chineseBox {
+	display: flex;
+	flex-flow: row;
+	align-items: center;
+}
+
+#notificationBox {
+	position: fixed;
+	top: 0;
+	right: 0;
+	left: 50%;
+	padding: 20px;
+}
+
+#notificationBox div {
+	font-size: 20px;
+	opacity: 0;
+	border-radius: 10px;
+	padding: 10px;
+	box-shadow: 4px 2px 20px rgba(0,0,0,0.7);
+	color: white;
+	margin: 10px;
+	word-wrap: break-word;
+
+	transition: 1s ease;
+}
+
+.notificationGood {
+	border: 2px solid var(--notificationbordergood);
+	background-color: var(--notificationbggood);
+}
+
+.notificationBad {
+	border: 2px solid var(--notificationborderbad);
+	background-color: var(--notificationbgbad);
+}
+
+.dropdown {
+  float: right;
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+	display: none;
+	position: absolute;
+	min-width: 500px;
+	overflow: auto;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	left: 0;
+	z-index: 1;
+	padding: 5px;
+	border: 1px solid var(--bordercol);
+	border-radius: 10px;
+	background-color: var(--mainbg);
+	max-height: 250px;
+}
+
+.dropdown-content * {
+	font-size: 20px;
+}
+
+.dropdown-content div:not(:last-child) {
+	border-bottom: 1px solid black; /* Add a solid black border to the bottom of each div except the last one */
+	padding: 5px; /* Add some padding for better visualization */
+}
+
+.show {display: block;}
+
+#textEdition {
+	display: none;
+}
+
+#submitText {
+	display: none;
+}
+
+#ankiButtonsBox {
+	display: flex;
+}
+
+#ankiButtonsBox * {
+	flex: 1;
+}
+
+#closeOverlay {
+	cursor: pointer;
+	color: red;
+	transform: scale(1.6);
+	background-color: transparent;
+}
+
+#overlayTopRightCorner {
+	width: 100%;
+	display: flex;
+	flex-direction: row-reverse;
+	padding: 0;
+	border: none;
+	margin: 0;
+}
+
+#ankiCardsDialog {
+	width: 100%;
+	margin: 0;
+}
+
+#ankiCardsContainer {
+	display: grid;
+	max-height: 500px;
+	overflow: scroll;
+	width: 100%;
+	grid-template-columns: 1fr 1fr 4fr 4fr auto;
+	text-align: left;
+	margin: 0;
+	border-radius: 10px;
+	box-shadow:
+		inset 0px 5px 0px rgba(255,255,255,0.1),
+		inset 0px -5px 0px rgba(255,255,255,0.1);
+}
+
+#ankiCardsContainer button {
+	width: fit-content;
+	height: fit-content;
+}
+
+#ankiCardsContainer div {
+	margin: 0;
+	padding: 3px;
+	border-bottom: 1px solid var(--bordercol);
+}
