@@ -26,34 +26,36 @@
         	<option id="fakeOption" disabled style="font-style:italic"></option>
 	</template>
 
-	<template id="ankiCardEntryTemplate">
-		<div id="hanzi"></div>
-		<div id="pinyin"></div>
-		<div id="example"></div>
-		<div id="meaning"></div>
-		<div>
-			<button id="deleteAnkiCard">
-				<i class="fa fa-trash"></i>
-			</button>
-			<button id="modifyAnkiCard">
-				<i class="fa fa-pencil"></i>
-			</button>
+
+	<template id="ankiCardDialogTemplate">
+		<div id="ankiCardDialog">
+			<h2 id="title">Criar Cartão Anki</h2>
+			<select id="dictionaryEntrySelector"></select>
+			<form id="inputBox">
+				<template id="fieldTemplate">
+					<input type="text" id="fieldInput">
+				</template>
+			</form>
+			<button id="submitButton">Criar</button>
+			<button id="returnButton">Voltar atrás</button>
 		</div>
 	</template>
 
-	<template id="createAnkiCardDialogTemplate">
-		<div id="createAnkiCardDialog">
-			<h2>Criar Cartão Anki</h2>
-			<select id="dictionaryEntrySelector" onchange="createAnkiCardDialog.dictionaryEntrySelectorChanged()"></select>
-			<input type="text" id="hanziInput" placeholder="汉字">
-			<input type="text" id="pinyinInput" placeholder="pīnyīn">
-			<input type="text" id="exampleInput" placeholder="Exemplo">
-			<input type="text" id="meaningInput" placeholder="Significado">
-			<button onclick="createAnkiCardDialog.submitAnkiCardButton()">Criar</button>
-		</div>
-	</template>
-
-	<template id="ankiCardsDialogTemplate">
+	<template id="showAnkiCardsDialogTemplate">
+		<template id="entryTemplate">
+			<template id="fieldTemplate">
+				<div id="field">
+				</div>
+			</template>
+			<div>
+				<button id="deleteAnkiCard">
+					<i class="fa fa-trash"></i>
+				</button>
+				<button id="modifyAnkiCard">
+					<i class="fa fa-pencil"></i>
+				</button>
+			</div>
+		</template>
 		<div id="ankiCardsDialog">
 			<div id="ankiCardsContainer">
 			</div>
@@ -63,8 +65,14 @@
 	<template id="deleteAnkiCardConfirmationTemplate">
 		<div>Tens a certeza de que pretendes deletar a seguinte carta?</div>
 		<div id="ankiCard"></div>
+			<template id="fieldTemplate">
+				<div id="fieldName">
+				</div>
+				<div id="fieldValue">
+				</div>
+			</template>
 		<div>
-			<button id="delete">Sim</button>
+			<button id="confirm">Sim</button>
 			<button id="return">Voltar atrás</button>
 		</div>
 
@@ -81,7 +89,7 @@
 		<div id="overlayContent">
 		</div>
 
-		<button onclick="Overlay.hide()">Fechar</button>
+		<button onclick="overlay.hide()">Fechar</button>
 	    </div>
 	</div>
 
@@ -131,13 +139,17 @@
 	<div class="box" id="dictionaryContainer"></div>
 
 	<div class="box" id="ankiButtonsBox">
-		<button onclick="createAnkiCardDialog.show()" class="create-anki-card">Criar cartão anki</button>
-		<button onclick="ShowAnkiCardsDialog.show()" id="showAnkiCardsButton">Listar cartões</button>
+		<button onclick="addAnkiCardButton()" id="createAnkiCardButton" class="create-anki-card">Criar cartão anki</button>
+		<button onclick="showAnkiCardsDialog.show()" id="showAnkiCardsButton">Listar cartões</button>
 	</div>
 
+	<script src="{{url_for('static', filename='assert.js')}}"></script>
+	<script src="{{url_for('static', filename='protocol.js')}}"></script>
+	<script src="{{url_for('static', filename='Anki.js')}}"></script>
 	<script src="{{url_for('static', filename='overlay.js')}}"></script>
 	<script src="{{url_for('static', filename='script.js')}}"></script>
-	<script src="{{url_for('static', filename='createAnkiCardDialog.js')}}"></script>
+	<script src="{{url_for('static', filename='notification.js')}}"></script>
+	<script src="{{url_for('static', filename='ankiCardDialog.js')}}"></script>
 	<script src="{{url_for('static', filename='showAnkiCardsButton.js')}}"></script>
 
 </body>

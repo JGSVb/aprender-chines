@@ -19,37 +19,6 @@ var selectionId = 0;
 
 var textEdition = false;
 
-const TYPE_GOOD = "Good";
-const TYPE_BAD = "Bad";
-
-function pushNotification(text, type){
-	const nBox = document.getElementById("notificationBox");
-	const nElem = document.createElement("div");
-	nElem.className = "notification" + type;
-	nElem.innerHTML = text;
-
-	nBox.appendChild(nElem);
-	nElem.style.opacity = "0.9";
-
-	return nElem
-}
-
-function popNotification(elem){
-	elem.style.opacity = "0";
-
-	setTimeout(function(){
-		elem.remove();
-	}, 1000);
-}
-
-function sendNotification(text, type){
-	const nElem = pushNotification(text, type);
-	setTimeout(function(){
-		popNotification(nElem);
-	}, 5000);
-}
-
-
 async function retrieveData(url) {
 	// Fetch the content of the page
 	return await fetch(url).then(function(response) {

@@ -4,15 +4,11 @@ import pinyin
 import jieba
 import json
 from flask import Flask, render_template, request, jsonify, Response, redirect
-
-"""
-from deep_translator import (GoogleTranslator,
-                             ChatGptTranslator,
-                             YandexTranslator,
-                             BaiduTranslator)
-"""
-
 from utils import *
+from typing import List
+
+from anki_utils import *
+from protocol import *
 
 _v = verbose
 
@@ -85,7 +81,6 @@ class Project:
         if rev:
             c.reverse()
         return c
-
 
 class CONFIG:
     target_dir = os.path.join(os.path.dirname(__file__), "target")
@@ -172,25 +167,34 @@ def dictionary():
     entries = get_dictionary_for(query)
     return jsonify(entries)
 
-@STATE.app.get("/anki_routine")
-def anki_routine():
-    question_a = request.args.get("question_a")
-    question_b = request.args.get("question_b")
-    awnser = request.args.get("awnser")
-    meaning = request.args.get("meaning")
+def default_return(function, *args, **kwargs):
+    def ret():
+        try:
+            function(*args, **kwargs)
+        except Exception as e:
+            return unsuccessful_answer(str(e))
+        else:
+            return successful_answer()
 
-    if None in (question_a, question_b, awnser, meaning):
-        return "Faltam campos"
+    return ret;
 
-    try:
-        STATE.project.add_card(question_a, question_b, awnser, meaning)
-    except Exception as e:
-        return str(e)
-    return ""
+class Cards:
+    @STATE.app.get("/json_cards")
+    def get_cards():
+        return successful_answer(STATE.project.anki_file.get_json_compatible_cards())
 
-@STATE.app.get("/cards")
-def get_cards():
-    return jsonify(STATE.project.anki_file.cards)
+    @STATE.app.post("/addcard")
+    def addcard():
+        card = AnkiCard(request.json)
+        return default_return(STATE.project.anki_file.add_card, card)()
+
+    @STATE.app.route("/card/<int:card_id>", methods=["POST", "DELETE"])
+    def card_route(card_id):
+        if request.method == "POST":
+            action, card = read_post_card_data(request.json)
+
+        if request.method == "DELETE":
+            return default_return(STATE.project.anki_file.delete_card, card_id)()
 
 
 def clean():

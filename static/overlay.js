@@ -1,4 +1,4 @@
-const Overlay = new class {
+const overlay = new class {
 	#element = document.getElementById("overlay");
 	#content = document.getElementById("overlayContent");
 

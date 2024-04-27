@@ -1,19 +1,44 @@
-const ShowAnkiCardsDialog = {
-	dialogTemplate: document.getElementById("ankiCardsDialogTemplate"),
-	ankiCardEntryTemplate: document.getElementById("ankiCardEntryTemplate"),
+const showAnkiCardsDialog = {
+	dialogTemplate: document.getElementById("showAnkiCardsDialogTemplate"),
+	entryTemplate: null,
 	deleteAnkiCardConfirmationTemplate: document.getElementById("deleteAnkiCardConfirmationTemplate"),
 	dialog: null,
 	ankiCardsDialog: null,
 	ankiCardsContainer: null,
 
-	showDeleteCardConfirmation: function(entry, index){
-		const deleteConfirmation = document.importNode(this.deleteAnkiCardConfirmationTemplate.content, true);
+	showDeleteCardConfirmation: function(card, index){
+		const deleteConfirmation = document.importNode(showAnkiCardsDialog.deleteAnkiCardConfirmationTemplate.content, true);
 
 		deleteConfirmation.getElementById("return").onclick = function(){
-			this.show();
-		}.bind(this);
+			showAnkiCardsDialog.show();
+		};
 
-		Overlay.setContent(deleteConfirmation);
+		deleteConfirmation.getElementById("confirm").onclick = function(){
+			protocol.deleteCard(card);
+			showAnkiCardsDialog.show();
+		};
+
+		const fieldContainer = deleteConfirmation.getElementById("ankiCard");
+		const cardFieldsTemplate = card.getFieldsTemplate();
+		const cardValues = card.getValues();
+
+		for(let i = 0; i < card.getFormat(); i++){
+			const cardField = cardFieldsTemplate[i];
+			const cardValue = cardValues[i];
+
+			const fieldTemplate = deleteConfirmation.getElementById("fieldTemplate");
+			const clone = document.importNode(fieldTemplate.content, true);
+
+			const fieldName = clone.getElementById("fieldName");
+			fieldName.innerHTML = cardField[0];
+
+			const fieldValue = clone.getElementById("fieldValue");
+			fieldValue.innerHTML = cardValue;
+
+			fieldContainer.appendChild(clone);
+		}
+
+		overlay.setContent(deleteConfirmation);
 	},
 
 	populate: function(json){
@@ -24,18 +49,32 @@ const ShowAnkiCardsDialog = {
 		for(let i = 0; i < json.length; i++){
 			const entry = json[i];
 
-			const clone = document.importNode(this.ankiCardEntryTemplate.content, true);
-			clone.getElementById("hanzi").innerHTML = entry[0];
-			clone.getElementById("pinyin").innerHTML = entry[1];
-			clone.getElementById("example").innerHTML = entry[2];
-			clone.getElementById("meaning").innerHTML = entry[3];
+			const clone = document.importNode(this.entryTemplate.content, true);
+			const card = new AnkiCard(entry.values, entry.id);
+
+			for(let k = 0; k < card.getFormat(); k++){
+
+				const fieldClone = document.importNode(
+				    clone.getElementById("fieldTemplate").content,
+				    true);
+
+				fieldClone.getElementById("field").innerHTML = entry.values[k];
+				clone.insertBefore(fieldClone, clone.children[clone.children.length - 1]);
+			}
 
 			clone.getElementById("deleteAnkiCard").onclick = function(){
-				this.showDeleteCardConfirmation(entry, i);
-			}.bind(this);
+				showAnkiCardsDialog.showDeleteCardConfirmation(card, i);
+			};
 
 			clone.getElementById("modifyAnkiCard").onclick = function(){
-				createAnkiCardDialog.show();
+				ankiCardDialog.setCard(card);
+				ankiCardDialog.show(
+					showSelector=false,
+					returnAction=function() {
+						showAnkiCardsDialog.show();
+					},
+				    	submitAction=showAnkiCardsDialog.modifyAnkiCard,
+				    	title="Modificar cartão Anki");
 			};
 
 			this.ankiCardsContainer.appendChild(clone);
@@ -46,14 +85,11 @@ const ShowAnkiCardsDialog = {
 		this.dialog = document.importNode(this.dialogTemplate.content, true);
 		this.ankiCardsDialog = this.dialog.getElementById("ankiCardsDialog");
 		this.ankiCardsContainer = this.dialog.getElementById("ankiCardsContainer");
+		this.entryTemplate = this.dialog.getElementById("entryTemplate");
 
-		Overlay.setVisible(true);
-		Overlay.setContent(this.dialog);
+		overlay.setVisible(true);
+		overlay.setContent(this.dialog);
 
-		fetch("cards")
-			.then(response => {return response.json()})
-			.then(json=> {
-				this.populate(json);
-		});
+		protocol.getJsonCards().then(this.populate);
 	}
 };
