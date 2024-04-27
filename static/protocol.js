@@ -90,6 +90,10 @@ const protocol = {
 
 	deleteCard: function(card, notificationOptions={successMessage: "Sucesso ao deletar carta", errorMessage: "Impossível deletar carta"}){
 		return this.delete("card/" + card.id, notificationOptions);
+	},
+
+	cutChineseString: function(text, notificationOptions={notifyError: false, notifySuccess: false}){
+		return this.post("cut_chinese_string", text);
 	}
 
 }

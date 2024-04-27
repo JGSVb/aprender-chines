@@ -61,6 +61,7 @@ function setText(elem, text){
 
 }
 
+/*
 var _fetchTexts = setInterval(async function() {
 
 	var text = await fetch("fetch_chinese?index=-1").then(response => response.text());
@@ -88,6 +89,7 @@ var _fetchTexts = setInterval(async function() {
 	}
 
 }, 700);
+*/
 
 async function fetchTranslation() {
 	var t = await translate(0, chineseText.replace(/\s/g, ''));

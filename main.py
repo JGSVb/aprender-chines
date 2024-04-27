@@ -169,14 +169,24 @@ def dictionary():
 
 def default_return(function, *args, **kwargs):
     def ret():
+        data = None
         try:
-            function(*args, **kwargs)
+            data = function(*args, **kwargs)
         except Exception as e:
             return unsuccessful_answer(str(e))
         else:
-            return successful_answer()
+            return successful_answer(data)
 
     return ret;
+
+@lru_cache()
+def cut_chinese_string(text):
+    return list(jieba.cut(text))
+
+@STATE.app.post("/cut_chinese_string")
+def _cut_chinese_string():
+    text = request.json
+    return default_return(cut_chinese_string, text)()
 
 class Cards:
     @STATE.app.get("/json_cards")
