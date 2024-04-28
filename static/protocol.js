@@ -1,3 +1,8 @@
+const notificationOptionsNoNotify = {
+	notifyError: false,
+	notifySuccess: false
+};
+
 const protocol = {
 	SUCCESS: "success",
 	ERROR: "error",
@@ -92,8 +97,25 @@ const protocol = {
 		return this.delete("card/" + card.id, notificationOptions);
 	},
 
-	cutChineseString: function(text, notificationOptions={notifyError: false, notifySuccess: false}){
-		return this.post("cut_chinese_string", text);
+	cutChineseString: function(text, notificationOptions=notificationOptionsNoNotify){
+		return this.post("cut_chinese_string", text, notificationOptions);
+	},
+
+	getTimedText: function(notificationOptions=notificationOptionsNoNotify){
+		return this.get("timedtext", notificationOptions);
+	},
+
+	pinyin: function(chineseText, notificationOptions=notificationOptionsNoNotify){
+		return this.post("pinyin", chineseText, notificationOptions);
+	},
+
+	translate: function(text, source, target, notificationOptions=notificationOptionsNoNotify){
+		return this.post("translate",
+			{
+				text: text,
+				sourceLanguage: source,
+				targetLanguage: target
+			}, notificationOptions);
 	}
 
 }

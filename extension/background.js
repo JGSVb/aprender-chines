@@ -1,5 +1,5 @@
 let passRightAway = false;
-let timedText = null;
+let timedtext = null;
 
 async function logURL(requestDetails) {
 	if(passRightAway){
@@ -20,7 +20,9 @@ async function logURL(requestDetails) {
 			return json;
 		});
 
-	timedText = data;
+	timedtext = data;
+
+	serverProtocol.post("http://127.0.0.1:5000/timedtext", timedtext);
 
 	passRightAway = false;
 }
@@ -28,3 +30,4 @@ async function logURL(requestDetails) {
 browser.webRequest.onBeforeRequest.addListener(logURL, {
 	urls: ["https://*.youtube.com/api/*"],
 });
+

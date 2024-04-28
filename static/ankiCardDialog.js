@@ -28,34 +28,27 @@ const ankiCardDialog = {
 		real.onclick = () => {
 			this.inputArray[0].value = entry.simplified;
 			this.inputArray[1].value = entry.pinyin;
-			this.inputArray[3].value = entry.portuguese;
+			this.inputArray[4].value = entry.portuguese;
 		};
 
 		this.selector.appendChild(clone);
 	},
 
-	updateSelector: function(){
+	updateSelector: async function(){
 		this.selector.innerHTML = "<option>Usufrua do dicionário</option>";
 
 		dictionary.forEach(entry => {
 			this.addSelectorOption(entry);
 		})
 
-		const pinyin = fetch("/pinyin?chinese=" + chineseSegment);
-		const translation = fetch("/translate?way=zh-CN,pt&text=" + chineseSegment);
+		let portuguese = await protocol.translate(chineseSegment, "zh-CN", "pt").data;
+		let pinyin = await protocol.pinyin(chineseSegment).data;
 
-		Promise.all([pinyin, translation])
-			.then(responses => {
-				const textPromises = responses.map(resp => { return resp.text() });
-				return Promise.all(textPromises);
-			})
-			.then(textPromises => {
-				this.addSelectorOption({
-						       simplified : chineseSegment,
-						       pinyin: textPromises[0],
-						       portuguese: textPromises[1]
-				})
-			});
+		this.addSelectorOption({
+		       simplified : chineseSegment,
+		       pinyin: pinyin,
+		       portuguese: portuguese
+		});
 	},
 
 	populate: function(){
@@ -131,8 +124,9 @@ const ankiCardDialog = {
 
 };
 
-function addAnkiCardButton(){
-	const n = new AnkiCard(["", "", chineseText, "", ""]);
+async function addAnkiCardButton(){
+	const translation = await protocol.translate(chineseText.currString, "zh-CN", "pt");
+	const n = new AnkiCard(["", "", chineseText.currString, translation, ""]);
 	ankiCardDialog.setCard(n);
 	ankiCardDialog.show();
 }

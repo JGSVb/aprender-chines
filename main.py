@@ -90,6 +90,7 @@ class STATE:
     app = Flask(__name__)
     wg = None
     project = None
+    timed_text = None
 
 def fetch_once():
     if STATE.wg.fetch_once():
@@ -144,23 +145,6 @@ def change_chinese():
     else:
         return ""
 
-@STATE.app.get("/pinyin")
-def pinyin_():
-    text = request.args.get("chinese")
-    return pinyin.get(text)
-
-@STATE.app.get("/words")
-def split_words():
-    text = request.args.get("chinese")
-    return jsonify(list(jieba.cut(text)))
-
-@STATE.app.get("/translate")
-def translate_():
-    text = request.args.get("text")
-    way = request.args.get("way")
-    source, target = way.split(",")
-    return translate(text, source, target)
-
 @STATE.app.get("/dictionary")
 def dictionary():
     query = request.args.get("query")
@@ -168,16 +152,21 @@ def dictionary():
     return jsonify(entries)
 
 def default_return(function, *args, **kwargs):
-    def ret():
-        data = None
-        try:
-            data = function(*args, **kwargs)
-        except Exception as e:
-            return unsuccessful_answer(str(e))
-        else:
-            return successful_answer(data)
+    data = None
+    try:
+        data = function(*args, **kwargs)
+    except Exception as e:
+        return unsuccessful_answer(str(e))
+    else:
+        return successful_answer(data)
 
-    return ret;
+@STATE.app.post("/translate")
+def translate_():
+    source = request.json["sourceLanguage"]
+    target = request.json["targetLanguage"]
+    text = request.json["text"]
+
+    return default_return(translate, text, source, target)
 
 @lru_cache()
 def cut_chinese_string(text):
@@ -186,7 +175,12 @@ def cut_chinese_string(text):
 @STATE.app.post("/cut_chinese_string")
 def _cut_chinese_string():
     text = request.json
-    return default_return(cut_chinese_string, text)()
+    return default_return(cut_chinese_string, text)
+
+@STATE.app.post("/pinyin")
+def pinyin_():
+    text = request.json
+    return default_return(pinyin.get, text)
 
 class Cards:
     @STATE.app.get("/json_cards")
@@ -196,7 +190,7 @@ class Cards:
     @STATE.app.post("/addcard")
     def addcard():
         card = AnkiCard(request.json)
-        return default_return(STATE.project.anki_file.add_card, card)()
+        return default_return(STATE.project.anki_file.add_card, card)
 
     @STATE.app.route("/card/<int:card_id>", methods=["POST", "DELETE"])
     def card_route(card_id):
@@ -204,7 +198,16 @@ class Cards:
             action, card = read_post_card_data(request.json)
 
         if request.method == "DELETE":
-            return default_return(STATE.project.anki_file.delete_card, card_id)()
+            return default_return(STATE.project.anki_file.delete_card, card_id)
+
+@STATE.app.route("/timedtext", methods=["POST", "GET"])
+def timedtext():
+    if request.method == "POST":
+        STATE.timed_text = request.json
+        return successful_answer()
+
+    if request.method == "GET":
+        return successful_answer(STATE.timed_text)
 
 
 def clean():

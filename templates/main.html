@@ -99,7 +99,7 @@
 	</div>
 
 	<div class="box" id="embed-box">
-	<iframe class="embed" src="{{video_url}}" accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+	<div id="youtubePlayer"></div>
 	</div>
 
 	<div class="box" id="custom-box">
@@ -117,7 +117,7 @@
 						<input id="textEdition"></input>
 						<button onclick="toggleTextEdition()"><i class="fa fa-pencil"></i></button>
 						<button id="submitText" onclick="submitEdition()">Enviar</button>
-						<button id="copyText" onclick="copyChineseText()">Copiar</button>
+						<button id="copyText" onclick="chineseText.copyText()">Copiar</button>
 					</div>
 				</div>
 			</div>
@@ -143,6 +143,9 @@
 		<button onclick="showAnkiCardsDialog.show()" id="showAnkiCardsButton">Listar cartões</button>
 	</div>
 
+	<script>
+		const GLOBAL_VIDEO_ID = "{{ video_url }}";
+	</script>
 	<script src="{{url_for('static', filename='assert.js')}}"></script>
 	<script src="{{url_for('static', filename='protocol.js')}}"></script>
 	<script src="{{url_for('static', filename='Anki.js')}}"></script>
@@ -150,6 +153,7 @@
 	<script src="{{url_for('static', filename='notification.js')}}"></script>
 	<script src="{{url_for('static', filename='ankiCardDialog.js')}}"></script>
 	<script src="{{url_for('static', filename='showAnkiCardsButton.js')}}"></script>
+	<script src="{{url_for('static', filename='youtubePlayer.js')}}"></script>
 	<script src="{{url_for('static', filename='chineseText.js')}}"></script>
 	<script src="{{url_for('static', filename='script.js')}}"></script>
 

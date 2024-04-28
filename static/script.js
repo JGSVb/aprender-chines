@@ -8,7 +8,7 @@ const translationPairs = [
 	["en", "pt"],
 ];
 
-var chineseText = "";
+// var chineseText = "";
 var chineseWords = [];
 var pinyinText = "";
 var chineseSegment = "";
@@ -46,10 +46,6 @@ async function translate(id, text){
 	translationDst[id] = result;
 	return translationDst[id];
 
-}
-
-function copyChineseText() {
-  navigator.clipboard.writeText(chineseText);
 }
 
 
