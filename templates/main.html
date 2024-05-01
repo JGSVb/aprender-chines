@@ -36,7 +36,7 @@
 					<input type="text" id="fieldInput">
 				</template>
 			</form>
-			<button id="submitButton">Criar</button>
+			<button id="submitButton">Enviar</button>
 			<button id="returnButton">Voltar atrás</button>
 		</div>
 	</template>
@@ -106,17 +106,8 @@
 		<div class="custom">
 			<div class="chineseOrPinyinBox">
 				<div>
-					<div class="dropdown">
-						<button onclick="dropdownButtonOnClick()" class="dropbtn">Navegar</button>
-						<div id="chineseOlderTexts" class="dropdown-content">
-						</div>
-					</div>
-
 					<div class="chineseBox">
 						<div class="textWords" id="chineseTextWords"></div>
-						<input id="textEdition"></input>
-						<button onclick="toggleTextEdition()"><i class="fa fa-pencil"></i></button>
-						<button id="submitText" onclick="submitEdition()">Enviar</button>
 						<button id="copyText" onclick="chineseText.copyText()">Copiar</button>
 					</div>
 				</div>
@@ -129,10 +120,10 @@
 
 	<div class="box" id="translator-box">
 		<div class="translator">
-			<button onclick="fetchTranslation()">Traduzir</button>
-			<div><div class="tt">Frase (EN)</div><text id="translate-zh-en"></text></div>
-			<div><div class="tt" id="ttcnen">Seleção (EN)<text class="preview" id="preview"></text></div><text id="translate-zh-en2"></text></div>
-			<div><div class="tt">Seleção (PT)</div><text id="translate-en-pt"></text></div>
+			<div><div class="tt">Frase (EN)</div><text id="translatorEnglishPhrase"></text></div>
+			<div><div class="tt">Frase (PT)</div><text id="translatorPortuguesePhrase"></text></div>
+			<div><div class="tt" id="ttcnen">Seleção (EN)<text class="preview" id="preview"></text></div><text id="translatorEnglishSelection"></text></div>
+			<div><div class="tt">Seleção (PT)</div><text id="translatorPortugueseSelection"></text></div>
 		</div>
 	</div>
 
@@ -155,6 +146,7 @@
 	<script src="{{url_for('static', filename='showAnkiCardsButton.js')}}"></script>
 	<script src="{{url_for('static', filename='youtubePlayer.js')}}"></script>
 	<script src="{{url_for('static', filename='chineseText.js')}}"></script>
+	<script src="{{url_for('static', filename='Translator.js')}}"></script>
 	<script src="{{url_for('static', filename='script.js')}}"></script>
 
 </body>

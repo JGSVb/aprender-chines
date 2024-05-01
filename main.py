@@ -33,14 +33,10 @@ class Project:
 
         self.json_filepath = os.path.join(CONFIG.project_folder, name + ".json")
         self.data = {
-                "chinese_text":[],
                 "project_name":name,
                 "video_url":video_url,
                 }
         self.read()
-
-    def add_card(self, a,b,c,d, write = True):
-        return self.anki_file.add_card(a,b,c,d,write)
 
     def write(self):
         with open(self.json_filepath, "w") as f:
@@ -54,41 +50,12 @@ class Project:
         with open(self.json_filepath, "r") as f:
             self.data = json.load(f)
 
-    def append_chinese_text(self, text, write = True):
-        if(not self.data["chinese_text"]):
-            self.data["chinese_text"].append(text)
-        elif(self.data["chinese_text"][-1] != text):
-            self.data["chinese_text"].append(text)
-
-        if write:
-            self.write()
-
-    def get_chinese_text_count(self):
-        return len(self.data["chinese_text"])
-
-    def get_chinese_text(self, index):
-        return self.data["chinese_text"][index]
-
-    def change_chinese_text(self, index, new, write = True):
-
-        self.data["chinese_text"][index] = new
-
-        if write:
-            self.write()
-
-    def copy_chinese_text_list(self, rev = True):
-        c = self.data["chinese_text"].copy()
-        if rev:
-            c.reverse()
-        return c
-
 class CONFIG:
     target_dir = os.path.join(os.path.dirname(__file__), "target")
     project_folder = os.path.join(os.path.dirname(__file__), "projects")
 
 class STATE:
     app = Flask(__name__)
-    wg = None
     project = None
     timed_text = None
 
@@ -110,7 +77,6 @@ def main_page():
 
     if not STATE.project or project_name != STATE.project.name:
         STATE.project = Project(project_name, video_url)
-        STATE.wg = Watchdog(CONFIG.target_dir)
 
     return render_template("main.html", video_url = video_url, project_name = project_name)
 
@@ -183,6 +149,10 @@ def pinyin_():
     return default_return(pinyin.get, text)
 
 class Cards:
+    def replace_anki_card(request, card_id):
+        new_card = AnkiCard(request.json)
+        STATE.project.anki_file.replace_card(card_id, new_card)
+
     @STATE.app.get("/json_cards")
     def get_cards():
         return successful_answer(STATE.project.anki_file.get_json_compatible_cards())
@@ -195,7 +165,7 @@ class Cards:
     @STATE.app.route("/card/<int:card_id>", methods=["POST", "DELETE"])
     def card_route(card_id):
         if request.method == "POST":
-            action, card = read_post_card_data(request.json)
+            return default_return(Cards.replace_anki_card, request, card_id)
 
         if request.method == "DELETE":
             return default_return(STATE.project.anki_file.delete_card, card_id)

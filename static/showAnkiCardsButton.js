@@ -73,7 +73,7 @@ const showAnkiCardsDialog = {
 					returnAction=function() {
 						showAnkiCardsDialog.show();
 					},
-				    	submitAction=showAnkiCardsDialog.modifyAnkiCard,
+				    	submitAction=ankiCardDialog.modifyAnkiCard,
 				    	title="Modificar cartão Anki");
 			};
 

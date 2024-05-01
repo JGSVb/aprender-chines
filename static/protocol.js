@@ -25,60 +25,38 @@ const protocol = {
 		}
 	},
 
-	default_return: function(resp){
-		const retObj = {
-			data: resp.data,
-			then: function(f){
-				return f(resp.data);
-			}.bind(resp),
-		}
-
-		if(resp.status == this.SUCCESS){
-			return retObj;
-		} else {
-			return null;
-		}
-	},
-
 	post: async function(url, data, notificationOptions){
 		const resp = await fetch(url, {
 				method: "POST",
 				body: JSON.stringify(data),
 				headers: {
 					"Content-Type": "application/json"
-				}
-			}).then(response => {
-				return response.json()
-			}).then(json => {
-				return json;
-			});
+					}});
 
-		this.notifier(resp, notificationOptions);
-		return this.default_return(resp);
+		const json = await resp.json();
+		const respData = json.data;
+
+		this.notifier(json, notificationOptions);
+		return respData;
 	},
 
 	get: async function(url, notificationOptions){
-		const resp = await fetch(url)
-			.then(response => {return response.json()})
-			.then(json => {
-				return json;
-			});
+		const resp = await fetch(url);
+		const json = await resp.json();
+		const respData = json.data;
 
-		this.notifier(resp, notificationOptions);
-		return this.default_return(resp);
+		this.notifier(json, notificationOptions);
+		return respData;
 	},
 
 	delete: async function(url, notificationOptions){
 		const resp = await fetch(url, {
-				method: "DELETE",
-			}).then(response => {
-				return response.json()
-			}).then(json => {
-				return json;
-			});
+				method: "DELETE"});
+		const json = await resp.json();
+		const respData = json.data;
 
-		this.notifier(resp, notificationOptions);
-		return this.default_return(resp);
+		this.notifier(json, notificationOptions);
+		return respData;
 	},
 
 	getJsonCards: function(notificationOptions={}){
@@ -90,7 +68,7 @@ const protocol = {
 	},
 
 	replaceCard: function(olderCard, card, notificationOptions={successMessage: "Carta substituída com sucesso", errorMessage: "Impossível substituir carta"}){
-		return this.post("card/" + olderCard.id, card.value,  notificationOptions);
+		return this.post("card/" + olderCard.id, card.getValues(), notificationOptions);
 	},
 
 	deleteCard: function(card, notificationOptions={successMessage: "Sucesso ao deletar carta", errorMessage: "Impossível deletar carta"}){

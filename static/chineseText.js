@@ -9,8 +9,8 @@ const chineseText = {
 	events: null,
 	necessaryFetching: true,
 
-	fetchTimedText: function(){
-		protocol.getTimedText().then(x => {
+	fetchTimedText: async function(){
+		await protocol.getTimedText().then(x => {
 			this.timedText = x;
 			this.events = x.events;
 		});
@@ -37,11 +37,19 @@ const chineseText = {
 			const event = self.events[i];
 			const nextEvent = self.events[i+1];
 
-			if(currTime >= event.tStartMs &&
-				currTime <= (event.tStartMs + event.dDurationMs)){
+			if(nextEvent &&
+				currTime >= event.tStartMs &&
+				currTime < nextEvent.tStartMs){
 
 				index = i;
 				break;
+
+			} else if(!nextEvent &&
+				currTime >= event.tStartMs){
+
+				index = i;
+				break;
+
 			}
 		}
 
@@ -60,7 +68,7 @@ const chineseText = {
 		return inOne;
 	},
 
-	showText: function(){
+	showText: async function(){
 		if(this.currString == this.prevString){
 			return;
 		}
@@ -68,37 +76,38 @@ const chineseText = {
 		this.chineseWordsBox.innerHTML = "";
 		this.pinyinWordsBox.innerHTML = "";
 
-		protocol.cutChineseString(this.currString).then(x => {
+		await protocol.cutChineseString(this.currString).then(async function(x){
 			for(let word of x){
 				const elem = document.createElement("div");
 				elem.innerHTML = word;
 				this.chineseWordsBox.appendChild(elem);
 
-				protocol.pinyin(word).then(x => {
-					const elem = document.createElement("div");
-					elem.innerHTML = x;
-					this.pinyinWordsBox.appendChild(elem);
-				});
+				let pinyin = await protocol.pinyin(word);
+				const pinyinElem = document.createElement("div");
+				pinyinElem.innerHTML = pinyin;
+				this.pinyinWordsBox.appendChild(pinyinElem);
 			}
-		})
+		}.bind(this));
 	},
 
 	copyText: function(){
 		navigator.clipboard.writeText(this.currString);
+		notification.sendGood("Copiado com sucesso!");
 	},
 
-	show: function(){
+	show: async function(){
 		if(this.necessaryFetching){
-			this.fetchTimedText();
+			await this.fetchTimedText();
 			this.necessaryFetching = false;
 		}
 
 		this.selectTimedText();
-		this.showText();
+		await this.showText();
 	}
 }
 
 chineseText.enable();
+
 playerStateChangeFunction = function(){
 	chineseText.necessaryFetching = true;
 };

@@ -80,7 +80,11 @@ const ankiCardDialog = {
 	addAnkiCard: function(){
 		const values = this.inputArray.map(x => x.value);
 		const card = new AnkiCard(values);
-		protocol.addCard(card);
+		protocol.addCard(card).then(data => {
+			if(data != null){
+				overlay.hide();
+			}
+		})
 	},
 
 	modifyAnkiCard: function(){

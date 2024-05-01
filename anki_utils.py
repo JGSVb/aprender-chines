@@ -141,6 +141,7 @@ class AnkiFile:
         else:
             index = self.cards.index(card)
             self.cards[index] = new_card
+            new_card.id = id
             self.post_replace_card_hook(new_card)
 
         return card
