@@ -25,6 +25,17 @@ const protocol = {
 		}
 	},
 
+	defaultReturn: function(json){
+		json.getData = function(){
+			return json.data;
+		};
+		json.getStatus = function(){
+			return json.status;
+		};
+
+		return json;
+	},
+
 	post: async function(url, data, notificationOptions){
 		const resp = await fetch(url, {
 				method: "POST",
@@ -34,29 +45,26 @@ const protocol = {
 					}});
 
 		const json = await resp.json();
-		const respData = json.data;
 
 		this.notifier(json, notificationOptions);
-		return respData;
+		return this.defaultReturn(json);
 	},
 
 	get: async function(url, notificationOptions){
 		const resp = await fetch(url);
 		const json = await resp.json();
-		const respData = json.data;
 
 		this.notifier(json, notificationOptions);
-		return respData;
+		return this.defaultReturn(json);
 	},
 
 	delete: async function(url, notificationOptions){
 		const resp = await fetch(url, {
 				method: "DELETE"});
 		const json = await resp.json();
-		const respData = json.data;
 
 		this.notifier(json, notificationOptions);
-		return respData;
+		return this.defaultReturn(json);
 	},
 
 	getJsonCards: function(notificationOptions={}){

@@ -7,12 +7,13 @@ const chineseText = {
 	currString: null,
 	timedText: null,
 	events: null,
+	selection: null,
 	necessaryFetching: true,
 
 	fetchTimedText: async function(){
 		await protocol.getTimedText().then(x => {
-			this.timedText = x;
-			this.events = x.events;
+			this.timedText = x.getData();
+			this.events = x.getData().events;
 		});
 	},
 
@@ -77,12 +78,14 @@ const chineseText = {
 		this.pinyinWordsBox.innerHTML = "";
 
 		await protocol.cutChineseString(this.currString).then(async function(x){
+			x = x.getData();
 			for(let word of x){
 				const elem = document.createElement("div");
 				elem.innerHTML = word;
 				this.chineseWordsBox.appendChild(elem);
 
 				let pinyin = await protocol.pinyin(word);
+				pinyin = pinyin.getData();
 				const pinyinElem = document.createElement("div");
 				pinyinElem.innerHTML = pinyin;
 				this.pinyinWordsBox.appendChild(pinyinElem);
@@ -110,4 +113,43 @@ chineseText.enable();
 
 playerStateChangeFunction = function(){
 	chineseText.necessaryFetching = true;
+};
+
+function getSelectedTextWithinDiv(parentDivId) {
+        let selectedText = "";
+        const parentDiv = document.getElementById(parentDivId);
+        const selection = window.getSelection();
+
+        if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const container = document.createElement("div");
+
+                // Check if the selection is within the parentDiv
+                if (parentDiv.contains(range.commonAncestorContainer)) {
+                        container.appendChild(range.cloneContents());
+                        selectedText = container.innerText; // Use innerText to get plain text
+                }
+        }
+
+        return selectedText;
+}
+
+document.onselectionchange = () => {
+
+	selectionId++;
+
+	var selection = getSelectedTextWithinDiv("chineseTextWords");
+
+	if(selection.length == 0) {
+		return;
+	}
+
+	// TODO: remover esta linha abaixo
+	chineseSegment = selection;
+
+	chineseText.selection = selection;
+	document.getElementById("preview").textContent = chineseSegment;
+
+	updateDictionary(selectionId);
+	translator.show();
 };

@@ -49,42 +49,9 @@ async function updateDictionary(selId) {
 
 		clone.getElementById("dictionaryPinyin").innerHTML = entry.pinyin;
 		clone.getElementById("dictionaryPortuguese").innerHTML = entry.portuguese;
+		clone.getElementById("dictionaryEnglish").innerHTML = entry.english;
 		dictionaryContainer.appendChild(clone);
 	});
 }
 
-function getSelectedTextWithinDiv(parentDivId) {
-        let selectedText = "";
-        const parentDiv = document.getElementById(parentDivId);
-        const selection = window.getSelection();
 
-        if (selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                const container = document.createElement("div");
-
-                // Check if the selection is within the parentDiv
-                if (parentDiv.contains(range.commonAncestorContainer)) {
-                        container.appendChild(range.cloneContents());
-                        selectedText = container.innerText; // Use innerText to get plain text
-                }
-        }
-
-        return selectedText;
-}
-
-document.onselectionchange = () => {
-
-	selectionId++;
-
-	var selection = getSelectedTextWithinDiv("chineseTextWords");
-
-	if(selection.length == 0) {
-		return;
-	}
-
-	chineseSegment = selection;
-	document.getElementById("preview").textContent = chineseSegment;
-
-	updateDictionary(selectionId);
-	translator.translate();
-};

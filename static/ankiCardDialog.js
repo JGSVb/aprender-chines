@@ -41,8 +41,10 @@ const ankiCardDialog = {
 			this.addSelectorOption(entry);
 		})
 
-		let portuguese = await protocol.translate(chineseSegment, "zh-CN", "pt").data;
-		let pinyin = await protocol.pinyin(chineseSegment).data;
+		let portuguese = await protocol.translate(chineseSegment, "zh-CN", "pt");
+		portuguese = portuguese.getData();
+		let pinyin = await protocol.pinyin(chineseSegment);
+		pinyin = pinyin.getData();
 
 		this.addSelectorOption({
 		       simplified : chineseSegment,
@@ -80,8 +82,8 @@ const ankiCardDialog = {
 	addAnkiCard: function(){
 		const values = this.inputArray.map(x => x.value);
 		const card = new AnkiCard(values);
-		protocol.addCard(card).then(data => {
-			if(data != null){
+		protocol.addCard(card).then(resp => {
+			if(resp.getStatus() == protocol.SUCCESS){
 				overlay.hide();
 			}
 		})
@@ -129,7 +131,9 @@ const ankiCardDialog = {
 };
 
 async function addAnkiCardButton(){
-	const translation = await protocol.translate(chineseText.currString, "zh-CN", "pt");
+	const translation = await protocol.translate(chineseText.currString, "zh-CN", "pt").then(resp => {
+		return resp.getData();
+	});
 	const n = new AnkiCard(["", "", chineseText.currString, translation, ""]);
 	ankiCardDialog.setCard(n);
 	ankiCardDialog.show();

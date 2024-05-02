@@ -44,10 +44,11 @@ const showAnkiCardsDialog = {
 	populate: function(json){
 		this.ankiCardsContainer.innerHTML = "";
 
-		json.reverse();
+		data = json.getData();
+		data.reverse();
 
-		for(let i = 0; i < json.length; i++){
-			const entry = json[i];
+		for(let i = 0; i < data.length; i++){
+			const entry = data[i];
 
 			const clone = document.importNode(this.entryTemplate.content, true);
 			const card = new AnkiCard(entry.values, entry.id);
