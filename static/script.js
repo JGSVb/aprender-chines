@@ -22,7 +22,7 @@ function collapsible(coll){
 }
 
 async function updateDictionary(selId) {
-	const data = await fetch("dictionary?query=" + chineseSegment).then(response => response.json());
+	const data = await fetch("/dictionary?query=" + chineseSegment).then(response => response.json());
 	if(data.length == 0) { return; }
 
 	if(selId != selectionId){
