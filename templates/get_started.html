@@ -2,20 +2,29 @@
 <html>
 	<head>
 		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 	</head>
-	<script>
-		function getStarted(){
-			var videoURL = document.getElementById("videoURLInput").value;
-			var projectName = document.getElementById("projectNameInput").value;
-			location.href = "/?video_url=" + videoURL + "&project_name=" + projectName;
-		}
-	</script>
 	<body>
 		<div class="box" id="getStartedBox">
-			<input type="text" id="videoURLInput" placeholder="URL do vídeo youtube"></input>
-			<input type="text" id="projectNameInput" placeholder="Nome do Projeto"></input>
-			<button onclick="getStarted()">Começar</button>
+			<form action="/create_project" method="POST">
+				<input type="text" name="video_url" placeholder="URL do vídeo youtube">
+				<input type="text" name="project_name" placeholder="Nome do Projeto">
+				<input type="submit" value="Enviar">
+			</form>
 		</div>
+		<div id="projectBox" class="box">
+			{% for project in projects %}
+			<div class="box">
+				<button onclick="goToProject('{{project}}')"><i class="fa-solid fa-folder-open"></i></button>
+				{{project}}
+			</div>
+			{% endfor %}
+		</div>
+		<script>
+			function goToProject(name){
+				window.location.href = "project/" + name;
+			}
+		</script>
 	</body>
 
 </html>

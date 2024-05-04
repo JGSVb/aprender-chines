@@ -4,7 +4,7 @@
 	"version": "1.0",
 	"description": "Extensão necessária para o site de aprender chinês funcionar",
 
-	"permissions": ["webRequest", "https://*.youtube.com/api/*", "http://127.0.0.1/*", "http://localhost/*"],
+	"permissions": ["webRequest", "https://*.youtube.com/api/*", "*://127.0.0.1/*", "*://localhost/*", "tabs"],
 
 	"background": {
 		"scripts": ["background.js", "protocol.js"]

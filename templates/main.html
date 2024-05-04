@@ -60,6 +60,7 @@
 			</div>
 		</template>
 		<div id="ankiCardsDialog">
+			<div id="counter"></div>
 			<div id="ankiCardsContainer">
 			</div>
 		</div>
@@ -118,14 +119,20 @@
 			<div class="chineseOrPinyinBox">
 				<div class="textWords" id="pinyinTextWords"></div>
 			</div>
+			<div class="chineseOrPinyinBox">
+				<div class="textWords" id="leftoverTextWords"></div>
+			</div>
 		</div>
 	</div>
 
 	<div class="box" id="translator-box">
 		<div class="translator">
+			<div>
+				<text class="preview" id="preview"></text>
+			</div>
 			<div><div class="tt">Frase (EN)</div><text id="translatorEnglishPhrase"></text></div>
 			<div><div class="tt">Frase (PT)</div><text id="translatorPortuguesePhrase"></text></div>
-			<div><div class="tt" id="ttcnen">Seleção (EN)<text class="preview" id="preview"></text></div><text id="translatorEnglishSelection"></text></div>
+			<div><div class="tt" id="ttcnen">Seleção (EN)</div><text id="translatorEnglishSelection"></text></div>
 			<div><div class="tt">Seleção (PT)</div><text id="translatorPortugueseSelection"></text></div>
 		</div>
 	</div>
@@ -133,12 +140,13 @@
 	<div class="box" id="dictionaryContainer"></div>
 
 	<div class="box" id="ankiButtonsBox">
-		<button onclick="addAnkiCardButton()" id="createAnkiCardButton" class="create-anki-card">Criar cartão anki</button>
+		<button onclick="addAnkiCardButton()" id="createAnkiCardButton" class="create-anki-card">Criar cartão anki <div id="createAnkiCardButtonChinese"></div></button>
 		<button onclick="showAnkiCardsDialog.show()" id="showAnkiCardsButton">Listar cartões</button>
 	</div>
 
 	<script>
-		const GLOBAL_VIDEO_ID = "{{ video_url }}";
+		const GLOBAL_VIDEO_ID = "{{ video_id }}";
+		const GLOBAL_VIDEO_URL = "{{ video_url }}";
 	</script>
 	<script src="{{url_for('static', filename='assert.js')}}"></script>
 	<script src="{{url_for('static', filename='protocol.js')}}"></script>

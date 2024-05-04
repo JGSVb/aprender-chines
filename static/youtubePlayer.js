@@ -13,7 +13,9 @@ function onYouTubeIframeAPIReady() {
 		videoId: GLOBAL_VIDEO_ID,
 		events: {
 			"onStateChange": onPlayerStateChange
-		}
+		},
+		width: "100%",
+		height: "100%"
 	});
 }
 

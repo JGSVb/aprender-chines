@@ -67,36 +67,36 @@ const protocol = {
 		return this.defaultReturn(json);
 	},
 
-	getJsonCards: function(notificationOptions={}){
-		return this.get("json_cards", notificationOptions);
+	getJsonCards: async function(notificationOptions={}){
+		return await this.get("/json_cards", notificationOptions);
 	},
 
-	addCard: function(card, notificationOptions={successMessage: "Sucesso ao adicionar carta", errorMessage: "Impossível adicionar carta"}){
-		return this.post("addcard", card.values, notificationOptions);
+	addCard: async function(card, notificationOptions={successMessage: "Sucesso ao adicionar carta", errorMessage: "Impossível adicionar carta"}){
+		return await this.post("/addcard", card.values, notificationOptions);
 	},
 
-	replaceCard: function(olderCard, card, notificationOptions={successMessage: "Carta substituída com sucesso", errorMessage: "Impossível substituir carta"}){
-		return this.post("card/" + olderCard.id, card.getValues(), notificationOptions);
+	replaceCard: async function(olderCard, card, notificationOptions={successMessage: "Carta substituída com sucesso", errorMessage: "Impossível substituir carta"}){
+		return await this.post("/card/" + olderCard.id, card.getValues(), notificationOptions);
 	},
 
-	deleteCard: function(card, notificationOptions={successMessage: "Sucesso ao deletar carta", errorMessage: "Impossível deletar carta"}){
-		return this.delete("card/" + card.id, notificationOptions);
+	deleteCard: async function(card, notificationOptions={successMessage: "Sucesso ao deletar carta", errorMessage: "Impossível deletar carta"}){
+		return await this.delete("/card/" + card.id, notificationOptions);
 	},
 
-	cutChineseString: function(text, notificationOptions=notificationOptionsNoNotify){
-		return this.post("cut_chinese_string", text, notificationOptions);
+	cutChineseString: async function(text, notificationOptions=notificationOptionsNoNotify){
+		return await this.post("/cut_chinese_string", text, notificationOptions);
 	},
 
-	getTimedText: function(notificationOptions=notificationOptionsNoNotify){
-		return this.get("timedtext", notificationOptions);
+	getTimedText: async function(notificationOptions=notificationOptionsNoNotify){
+		return await this.get("/timedtext", notificationOptions);
 	},
 
-	pinyin: function(chineseText, notificationOptions=notificationOptionsNoNotify){
-		return this.post("pinyin", chineseText, notificationOptions);
+	pinyin: async function(chineseText, notificationOptions=notificationOptionsNoNotify){
+		return await this.post("/pinyin", chineseText, notificationOptions);
 	},
 
-	translate: function(text, source, target, notificationOptions=notificationOptionsNoNotify){
-		return this.post("translate",
+	translate: async function(text, source, target, notificationOptions=notificationOptionsNoNotify){
+		return await this.post("/translate",
 			{
 				text: text,
 				sourceLanguage: source,

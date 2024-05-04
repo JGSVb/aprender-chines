@@ -137,4 +137,6 @@ async function addAnkiCardButton(){
 	const n = new AnkiCard(["", "", chineseText.currString, translation, ""]);
 	ankiCardDialog.setCard(n);
 	ankiCardDialog.show();
+
+	ankiCardDialog.selector.children[1].onclick();
 }

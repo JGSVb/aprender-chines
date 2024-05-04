@@ -56,9 +56,12 @@ class Translator {
 			result = await protocol.translate(text, vec.source, vec.target);
 			result = await result.getData();
 
+			if(!result){
+				return;
+			}
+
 			this.oldValues[i] = this.currentValues[i];
 			this.currentValues[i] = result;
-
 		}
 
 	}

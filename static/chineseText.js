@@ -1,10 +1,12 @@
 const chineseText = {
 	chineseWordsBox: document.getElementById("chineseTextWords"),
 	pinyinWordsBox: document.getElementById("pinyinTextWords"),
+	leftoverBox: document.getElementById("leftoverTextWords"),
 	prevTextIndex: 0,
 	currTextIndex: 0,
 	prevString: null,
 	currString: null,
+	leftoverString: null,
 	timedText: null,
 	events: null,
 	selection: null,
@@ -12,8 +14,9 @@ const chineseText = {
 
 	fetchTimedText: async function(){
 		await protocol.getTimedText().then(x => {
-			this.timedText = x.getData();
-			this.events = x.getData().events;
+			const data = x.getData();
+			this.timedText = data;
+			this.events = data.events;
 		});
 	},
 
@@ -25,7 +28,12 @@ const chineseText = {
 		this.prevTextIndex = this.currTextIndex;
 		this.currTextIndex = index;
 		this.prevString = this.currString;
-		this.currString = this.getTextByIndex(this.currTextIndex);
+
+		const string = this.getTextByIndex(this.currTextIndex);
+		let sliceIndex = string.indexOf("\n");
+
+		this.currString = string.slice(0, sliceIndex);
+		this.leftoverString = string.slice(sliceIndex);
 	},
 
 	selectTimedText: function(){
@@ -91,6 +99,8 @@ const chineseText = {
 				this.pinyinWordsBox.appendChild(pinyinElem);
 			}
 		}.bind(this));
+
+		this.leftoverBox.innerHTML = this.leftoverString;
 	},
 
 	copyText: function(){
@@ -152,4 +162,6 @@ document.onselectionchange = () => {
 
 	updateDictionary(selectionId);
 	translator.show();
+
+	document.getElementById("createAnkiCardButtonChinese").innerHTML = chineseText.selection;
 };

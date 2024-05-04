@@ -23,3 +23,18 @@ def successful_answer(data={}):
 
 def unsuccessful_answer(message):
     return json.dumps(build_answer(Status.error, message, None))
+
+def response_func(f):
+    def inner(*args, **kwargs):
+        data = None
+
+        try:
+            data = f(*args, **kwargs)
+        except Exception as e:
+            return unsuccessful_answer(str(e))
+        else:
+            return successful_answer(data)
+
+    inner.__name__ = f.__name__
+    return inner
+

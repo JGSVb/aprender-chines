@@ -5,6 +5,7 @@ const showAnkiCardsDialog = {
 	dialog: null,
 	ankiCardsDialog: null,
 	ankiCardsContainer: null,
+	counterElement: null,
 
 	showDeleteCardConfirmation: function(card, index){
 		const deleteConfirmation = document.importNode(showAnkiCardsDialog.deleteAnkiCardConfirmationTemplate.content, true);
@@ -47,6 +48,8 @@ const showAnkiCardsDialog = {
 		data = json.getData();
 		data.reverse();
 
+		this.counterElement.innerHTML = data.length;
+
 		for(let i = 0; i < data.length; i++){
 			const entry = data[i];
 
@@ -87,10 +90,11 @@ const showAnkiCardsDialog = {
 		this.ankiCardsDialog = this.dialog.getElementById("ankiCardsDialog");
 		this.ankiCardsContainer = this.dialog.getElementById("ankiCardsContainer");
 		this.entryTemplate = this.dialog.getElementById("entryTemplate");
+		this.counterElement = this.dialog.getElementById("counter");
 
 		overlay.setVisible(true);
 		overlay.setContent(this.dialog);
 
-		protocol.getJsonCards().then(this.populate);
+		protocol.getJsonCards().then(this.populate.bind(this));
 	}
 };

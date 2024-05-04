@@ -355,3 +355,7 @@ input {
 	padding: 3px;
 	border-bottom: 1px solid var(--bordercol);
 }
+
+#leftoverTextWords {
+	margin-top: 10px;
+}

@@ -2,19 +2,15 @@ const serverProtocol = {
 	SUCCESS: "success",
 	ERROR: "error",
 
-	default_return: function(resp){
-		const retObj = {
-			data: resp.data,
-			then: function(f){
-				return f(resp.data);
-			}.bind(resp),
-		}
+	defaultReturn: function(json){
+		json.getData = function(){
+			return json.data;
+		};
+		json.getStatus = function(){
+			return json.status;
+		};
 
-		if(resp.status == this.SUCCESS){
-			return retObj;
-		} else {
-			return null;
-		}
+		return json;
 	},
 
 	post: async function(url, data){
@@ -23,35 +19,25 @@ const serverProtocol = {
 				body: JSON.stringify(data),
 				headers: {
 					"Content-Type": "application/json"
-				}
-			}).then(response => {
-				return response.json()
-			}).then(json => {
-				return json;
-			});
+					}});
 
-		return this.default_return(resp);
+		const json = await resp.json();
+
+		return this.defaultReturn(json);
 	},
 
 	get: async function(url){
-		const resp = await fetch(url)
-			.then(response => {return response.json()})
-			.then(json => {
-				return json;
-			});
+		const resp = await fetch(url);
+		const json = await resp.json();
 
-		return this.default_return(resp);
+		return this.defaultReturn(json);
 	},
 
 	delete: async function(url){
 		const resp = await fetch(url, {
-				method: "DELETE",
-			}).then(response => {
-				return response.json()
-			}).then(json => {
-				return json;
-			});
+				method: "DELETE"});
+		const json = await resp.json();
 
-		return this.default_return(resp);
+		return this.defaultReturn(json);
 	},
 }
