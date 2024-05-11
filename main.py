@@ -12,7 +12,7 @@ from protocol import *
 
 _v = verbose
 
-proj_conf = ProjectConfig("Projetos")
+proj_conf = ProjectConfig("Projetos", "config.json", "anki.txt")
 Project.configure(proj_conf)
 
 class STATE:

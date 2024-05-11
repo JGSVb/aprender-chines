@@ -7,10 +7,14 @@ from anki_utils import *
 class ProjectConfig:
 
     def __init__(self,
-                 projects_folder : str):
+                 projects_folder : str,
+                 json_filename : str,
+                 anki_filename : str):
 
         self._locked = False
         self.projects_folder = os.path.abspath(projects_folder)
+        self.json_filename = json_filename
+        self.anki_filename = anki_filename
 
         def erase_init():
             raise Exception("Só pode haver uma configuração")
@@ -42,21 +46,29 @@ class Project:
             ]
 
     @classmethod
-    def get_filepath(cls, filename):
-        dir = cls._config.projects_folder
-
-        if not os.path.isdir(dir):
-            raise Exception(f"A pasta não é uma pasta, ou não existe: {dir}")
-
-        return os.path.join(dir, filename)
+    def get_dirpath(cls, name):
+        return os.path.join(cls._config.projects_folder, name)
 
     @classmethod
-    def get_filename(cls, name):
-        return name + ".json"
+    def get_json_filepath(cls, name):
+        dir = cls.get_dirpath(name)
+
+        return os.path.join(dir, cls._config.json_filename)
 
     @classmethod
     def get_ankifile_filepath(cls, name):
-        return os.path.join(cls._config.projects_folder, name + ".txt")
+        dir = cls.get_dirpath(name)
+        return os.path.join(dir, cls._config.anki_filename)
+
+    @classmethod
+    def build_tree(cls, name):
+        dirpath = cls.get_dirpath(name)
+
+        if os.path.isfile(dirpath):
+            raise Exception(f"Impossível criar árvore do projeto, visto o diretório ser um ficheiro: {dirpath}")
+
+        if not os.path.isdir(dirpath):
+            os.mkdir(dirpath)
 
     @classmethod
     def configure(cls, config : ProjectConfig):
@@ -71,13 +83,12 @@ class Project:
 
     @classmethod
     def create_project(cls, name : str, video_url : str):
-        filename = cls.get_filename(name)
-        filepath = cls.get_filepath(filename)
+        dirpath = cls.get_dirpath(name)
 
-        if os.path.isfile(filepath):
-            raise Exception(f"Ficheiro existe: {filepath}")
-        elif os.path.isdir(filepath):
-            raise Exception(f"Ficheiro existe e é uma pasta: {filepath}")
+        if name in cls.get_projects():
+            raise Exception(f"Projeto existe: {name}")
+
+        cls.build_tree(name)
 
         p = Project(name)
         p.video_url = video_url
@@ -100,7 +111,7 @@ class Project:
     @classmethod
     def get_projects(cls):
         p = os.listdir(cls._config.projects_folder)
-        p = [x[:-5] for x in p if x.endswith(".json")]
+        p = [x for x in p if os.path.isdir(x)]
         return p
 
     @classmethod
@@ -111,20 +122,20 @@ class Project:
         self._protected_lock = True
         self._ready = False
 
-        self.filename = Project.get_filename(name) 
-        self.filepath = Project.get_filepath(self.filename)
+        self.dirpath = Project.get_dirpath(name)
+        self.json_filepath = Project.get_json_filepath(name)
 
         self.video_url : str = None
-        self.last_access : int = None
+        self.last_access : float = None
 
         self.anki_file = AnkiFile(Project.get_ankifile_filepath(name))
 
         self._lock()
 
-        if os.path.isfile(self.filepath):
+        if os.path.isfile(self.json_filepath):
             self.read()
-        elif os.path.isdir(self.filepath):
-            raise Exception(f"{self.filename} é um pasta; tal é inaceitável")
+        elif os.path.isdir(self.json_filepath):
+            raise Exception(f"{self.json_filename} é um pasta; tal é inaceitável")
 
         self._ready = True
 
@@ -148,16 +159,19 @@ class Project:
             self.write()
 
     def write(self):
+        if not os.path.isdir(self.dirpath):
+            os.mkdir(self.dirpath)
+
         d = {}
         for x in self._properties:
             d[x] = getattr(self, x)
 
-        with open(self.filepath, "w") as f:
+        with open(self.json_filepath, "w") as f:
             json.dump(d, f)
 
     def read(self):
         data = None
-        with open(self.filepath, "r") as f:
+        with open(self.json_filepath, "r") as f:
             data = json.load(f)
 
         for key,val in data.items():
@@ -170,9 +184,11 @@ class Project:
         self._lock()
 
 def __test():
-    config = ProjectConfig("ProjetosDeTeste")
+    config = ProjectConfig("ProjetosDeTeste", "config.json", "anki.txt")
+    proj_name = str(random.randint(0, 9999))
     Project.configure(config)
-    Project.create_project(str(random.randint(0, 10000)), "queijo")
+    Project.create_project(proj_name, "queijo")
+    Project.open_project(proj_name)
 
 if __name__ == "__main__":
     __test()
