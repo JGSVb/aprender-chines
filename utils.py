@@ -1,5 +1,4 @@
 import os
-import easyocr
 import json
 from deep_translator import GoogleTranslator
 from parser import parsed_dict
