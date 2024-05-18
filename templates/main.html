@@ -82,6 +82,16 @@
 
 	</template>
 
+	<template id="imageSearchTemplate">
+		<template id="imageItem">
+			<div>
+				<img>
+			</div>
+		</template>
+		<div id="imageResultBox">
+		</div>
+	</template>
+
 </head>
 <body>
 
@@ -158,6 +168,7 @@
 	<script src="{{url_for('static', filename='youtubePlayer.js')}}"></script>
 	<script src="{{url_for('static', filename='chineseText.js')}}"></script>
 	<script src="{{url_for('static', filename='Translator.js')}}"></script>
+	<script src="{{url_for('static', filename='ImageSearch.js')}}"></script>
 	<script src="{{url_for('static', filename='script.js')}}"></script>
 
 </body>

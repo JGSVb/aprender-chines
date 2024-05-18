@@ -53,6 +53,32 @@ const ankiCardDialog = {
 		});
 	},
 
+	buildField: function(i){
+		const cardFieldTemplateList = this.card.getFieldsTemplate();
+		const cardValueList = this.card.getValues();
+
+		cardFieldTemplate = cardFieldTemplateList[i];
+
+		cardValue = cardValueList[i];
+		const fieldTemplate = this.dialog.getElementById("fieldTemplate");
+		const fieldClone = document.importNode(fieldTemplate.content, true);
+
+		const fieldInput = fieldClone.getElementById("fieldInput");
+		fieldInput.name = cardFieldTemplate[0];
+		fieldInput.placeholder = cardFieldTemplate[1];
+		fieldInput.value = cardValue;
+
+		if(cardFieldTemplate[2] == "image"){
+			const is = new ImageSearch("banana");
+			const elem = is.getElement();
+			is.update();
+
+			fieldClone.appendChild(elem);
+		}
+
+		return [fieldClone, fieldInput];
+	},
+
 	populate: function(){
 		this.inputArray = [];
 
@@ -60,16 +86,7 @@ const ankiCardDialog = {
 		const cardValueList = this.card.getValues();
 
 		for(let i = 0; i < this.card.getFormat(); i++){
-			cardFieldTemplate = cardFieldTemplateList[i];
-			cardValue = cardValueList[i];
-			const fieldTemplate = this.dialog.getElementById("fieldTemplate");
-			const fieldClone = document.importNode(fieldTemplate.content, true);
-
-			const fieldInput = fieldClone.getElementById("fieldInput");
-			fieldInput.name = cardFieldTemplate[0];
-			fieldInput.placeholder = cardFieldTemplate[1];
-			fieldInput.value = cardValue;
-
+			const [fieldClone, fieldInput] = this.buildField(i);
 			this.inputBox.insertBefore(fieldClone, this.inputBox.lastChild);
 			this.inputArray.push(fieldInput);
 		}

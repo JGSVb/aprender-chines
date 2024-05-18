@@ -359,3 +359,22 @@ input {
 #leftoverTextWords {
 	margin-top: 10px;
 }
+
+#imageResultBox {
+	display: grid;
+	grid-auto-rows: 100%;
+
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	max-height: 500px;
+	height: 500px;
+	overflow-y: auto;
+}
+
+#imageResultBox > div > img{
+	max-width: 100px;
+	height: 100px;
+
+	margin: 0;
+	border: none;
+	padding: 0;
+}

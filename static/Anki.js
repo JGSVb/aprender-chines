@@ -1,10 +1,11 @@
 const DEFAULT_ANKI_FORMAT = 5;
 const DEFAULT_ANKI_FIELDS_TEMPLATE = [
-	["hanzi", "汉字"],
-	["pinyin", "pīnyīn"],
-	["example", "exemplo"],
-	["translation", "tradução"],
-	["meaning", "significado"]
+	["hanzi", "汉字", "text"],
+	["pinyin", "pīnyīn", "text"],
+	["example", "exemplo", "text"],
+	["translation", "tradução", "text"],
+	["meaning", "significado", "text"],
+	// ["image", "imagem", "image"]
 ];
 
 class AnkiCard {

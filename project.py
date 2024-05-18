@@ -110,9 +110,13 @@ class Project:
 
     @classmethod
     def get_projects(cls):
-        p = os.listdir(cls._config.projects_folder)
-        p = [x for x in p if os.path.isdir(x)]
-        return p
+        projects = os.listdir(cls._config.projects_folder)
+        for p in projects:
+            filepath = os.path.join(cls._config.projects_folder, p)
+            if not os.path.isdir(filepath):
+                projects.remove(p)
+
+        return projects
 
     @classmethod
     def current(cls):

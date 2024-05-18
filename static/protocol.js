@@ -102,6 +102,15 @@ const protocol = {
 				sourceLanguage: source,
 				targetLanguage: target
 			}, notificationOptions);
+	},
+
+	searchImage: async function(query, notificationOptions={
+		successMessage: "Sucesso ao fazer busca por imagem",
+		errorMessage: "Impossível buscar imagem"
+	}){
+
+		return await this.get("/image_search?q="+query,
+			notificationOptions);
 	}
 
 }

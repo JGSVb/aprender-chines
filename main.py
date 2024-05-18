@@ -1,6 +1,8 @@
 import os
 import pinyin
 import jieba
+from dotenv import load_dotenv
+from requests import get as req_get
 from urllib.parse import urlparse, parse_qs
 from flask import Flask, render_template, request, jsonify, Response, redirect
 from utils import *
@@ -114,6 +116,26 @@ def timedtext():
 
     if request.method == "GET":
         return STATE.timedtext
+
+load_dotenv()
+CX_ID = os.environ["CX_ID"]
+API_KEY = os.environ["API_KEY"]
+
+search_api_link = "https://www.googleapis.com/customsearch/v1?c2coff=1&searchType=image&key={}&cx={}&q={}"
+
+def get_request_location(query):
+    return search_api_link.format(API_KEY, CX_ID, query)
+
+@STATE.app.get("/image_search")
+@response_func
+def search():
+    query = request.args.get("q")
+    location = get_request_location(query)
+    result = req_get(location).json()
+
+    output = [x["link"] for x in result["items"]]
+
+    return output
 
 def main():
     STATE.app.run(debug=True)
