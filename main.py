@@ -28,7 +28,10 @@ def get_youtube_video_id(youtube_video_url):
 
 @STATE.app.get("/")
 def main_page():
-    return render_template("get_started.html", projects = Project.get_projects())
+    projects = Project.get_projects()
+    projects.sort(key=Project.cmp_func_last_access)
+    projects.reverse()
+    return render_template("get_started.html", projects=projects)
 
 @STATE.app.get("/project/<project_name>")
 def projects(project_name):
@@ -44,7 +47,7 @@ def create_project():
 
     video_id = get_youtube_video_id(video_url)
     Project.create_project(name = project_name, video_url = video_url)
-    return render_template("main.html", video_url = video_url, video_id = video_id, project_name = project_name)
+    return redirect("/project/" + project_name)
 
 @STATE.app.get("/dictionary")
 def dictionary():

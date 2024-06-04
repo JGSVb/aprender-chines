@@ -13,11 +13,15 @@
 			</form>
 		</div>
 		<div id="projectBox" class="box">
-			{% for project in projects %}
-			<div class="box">
-				<button onclick="goToProject('{{project}}')"><i class="fa-solid fa-folder-open"></i></button>
-				{{project}}
-			</div>
+			{% for i in range(projects|length) %}
+				{% if i == 0 %}
+					<div class="box last_accessed">
+				{% else %}
+					<div class="box">
+				{% endif %}
+					<button onclick="goToProject('{{projects[i]}}')"><i class="fa-solid fa-folder-open"></i></button>
+					{{projects[i]}}
+				</div>
 			{% endfor %}
 		</div>
 		<script>

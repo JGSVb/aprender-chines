@@ -30,10 +30,10 @@ const chineseText = {
 		this.prevString = this.currString;
 
 		const string = this.getTextByIndex(this.currTextIndex);
-		let sliceIndex = string.indexOf("\n");
-
-		this.currString = string.slice(0, sliceIndex);
-		this.leftoverString = string.slice(sliceIndex);
+		const lines = string.split(/\r?\n/);
+		this.currString = string;
+		this.leftoverString = "";
+		// this.leftoverString = lines[0] + "\n" + lines[2];
 	},
 
 	selectTimedText: function(){

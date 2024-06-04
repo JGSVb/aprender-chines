@@ -26,6 +26,7 @@
 	--dialogbg: rgb(50, 50, 50);
 	--buttonfg: #F8EFBA;
 	--bordercol: rgb(152, 153, 153);
+	--borderactive: #0984e3;
 	--buttonbg: #485460;
 	--buttonactive: rgb(0,0,255);
 	--linkfg: #4bcffa;
@@ -378,3 +379,19 @@ input {
 	border: none;
 	padding: 0;
 }
+
+.last_accessed {
+	border-color: var(--borderactive);
+	border-width: 2px;
+}
+
+#returnMainPage {
+	position: absolute;
+	left: 30px;
+}
+
+#returnMainPage i {
+	transform: rotate(180deg);
+}
+
+

@@ -45,6 +45,10 @@ class Project:
             "last_access"
             ]
 
+    @staticmethod
+    def cmp_func_last_access(name : str):
+        return Project(name, load_anki=False).last_access
+
     @classmethod
     def get_dirpath(cls, name):
         return os.path.join(cls._config.projects_folder, name)
@@ -122,9 +126,11 @@ class Project:
     def current(cls):
         return cls._current_project
 
-    def __init__(self, name : str):
+    def __init__(self, name : str, load_anki = True):
         self._protected_lock = True
         self._ready = False
+
+        self.name = name
 
         self.dirpath = Project.get_dirpath(name)
         self.json_filepath = Project.get_json_filepath(name)
@@ -132,14 +138,14 @@ class Project:
         self.video_url : str = None
         self.last_access : float = None
 
-        self.anki_file = AnkiFile(Project.get_ankifile_filepath(name))
+        self.anki_file = None
+
+        if(load_anki):
+            self.load_anki()
 
         self._lock()
 
-        if os.path.isfile(self.json_filepath):
-            self.read()
-        elif os.path.isdir(self.json_filepath):
-            raise Exception(f"{self.json_filename} é um pasta; tal é inaceitável")
+        self.read()
 
         self._ready = True
 
@@ -181,6 +187,9 @@ class Project:
         for key,val in data.items():
             if key in self._properties:
                 self.__setattr__(key, val)
+
+    def load_anki(self):
+        self.anki_file = AnkiFile(Project.get_ankifile_filepath(self.name))
 
     def update_last_access(self):
         self._unlock()
