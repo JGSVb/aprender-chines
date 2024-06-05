@@ -1,11 +1,31 @@
 const DEFAULT_ANKI_FORMAT = 5;
 const DEFAULT_ANKI_FIELDS_TEMPLATE = [
-	["hanzi", "汉字", "text"],
-	["pinyin", "pīnyīn", "text"],
-	["example", "exemplo", "text"],
-	["translation", "tradução", "text"],
-	["meaning", "significado", "text"],
-	// ["image", "imagem", "image"]
+	["hanzi", "汉字", "text", {
+		revertButton: false,
+		updateButton: false,
+	}],
+	["pinyin", "pīnyīn", "text", {
+		revertButton: false,
+		updateButton: false,
+	}],
+	["example", "exemplo", "text", {
+		revertButton: true,
+		updateButton: false,
+	}],
+	["translation", "tradução", "text", {
+		revertButton: true,
+		updateButton: true,
+		updateButtonAction: function(){
+			const hanziText = this.inputArray[2].value;
+			protocol.translate(hanziText, "zh-CN", "pt").then(resp => {
+				this.inputArray[3].value = resp.data;
+			})
+		}
+	}],
+	["meaning", "significado", "text", {
+		revertButton: false,
+		updateButton: false,
+	}],
 ];
 
 class AnkiCard {

@@ -68,6 +68,26 @@ const ankiCardDialog = {
 		fieldInput.placeholder = cardFieldTemplate[1];
 		fieldInput.value = cardValue;
 
+		const fieldRevertButton = fieldClone.getElementById("revertButton");
+
+		if(cardFieldTemplate[3].revertButton == false){
+			fieldRevertButton.style.display = "none";
+		} else {
+			fieldRevertButton.onclick = async function() {
+				protocol.getCardJson(-1).then(resp => {
+					fieldInput.value = resp.data.values[i];
+				})
+			}
+		}
+
+		const fieldUpdateButton = fieldClone.getElementById("updateButton");
+
+		if(cardFieldTemplate[3].updateButton == false){
+			fieldUpdateButton.style.display = "none";
+		} else {
+			fieldUpdateButton.onclick = cardFieldTemplate[3].updateButtonAction.bind(this);
+		}
+
 		if(cardFieldTemplate[2] == "image"){
 			const is = new ImageSearch("banana");
 			const elem = is.getElement();
@@ -76,7 +96,7 @@ const ankiCardDialog = {
 			fieldClone.appendChild(elem);
 		}
 
-		return [fieldClone, fieldInput];
+		return [fieldClone, fieldInput, fieldRevertButton];
 	},
 
 	populate: function(){
@@ -86,8 +106,8 @@ const ankiCardDialog = {
 		const cardValueList = this.card.getValues();
 
 		for(let i = 0; i < this.card.getFormat(); i++){
-			const [fieldClone, fieldInput] = this.buildField(i);
-			this.inputBox.insertBefore(fieldClone, this.inputBox.lastChild);
+			const [fieldClone, fieldInput, revertButton] = this.buildField(i);
+			this.inputBox.insertBefore(fieldClone, this.inputBox.lastElementChild);
 			this.inputArray.push(fieldInput);
 		}
 

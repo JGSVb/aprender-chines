@@ -394,4 +394,15 @@ input {
 	transform: rotate(180deg);
 }
 
+#fieldBox {
+	display: flex;
+	flex-flow: row;
+}
 
+#fieldBox button {
+	border-radius: 50%;
+}
+
+#overlayContent {
+	width: 100%;
+}

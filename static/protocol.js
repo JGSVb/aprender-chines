@@ -71,6 +71,10 @@ const protocol = {
 		return await this.get("/json_cards", notificationOptions);
 	},
 
+	getCardJson: async function(index, notificationOptions={}){
+		return await this.get("/json_card_by_index?index=" + index);
+	},
+
 	addCard: async function(card, notificationOptions={successMessage: "Sucesso ao adicionar carta", errorMessage: "Impossível adicionar carta"}){
 		return await this.post("/addcard", card.values, notificationOptions);
 	},

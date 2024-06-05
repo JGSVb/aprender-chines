@@ -34,11 +34,19 @@
 		<div id="ankiCardDialog">
 			<h2 id="title">Criar Cartão Anki</h2>
 			<select id="dictionaryEntrySelector"></select>
-			<form id="inputBox">
+			<div id="inputBox">
 				<template id="fieldTemplate">
-					<input type="text" id="fieldInput">
+					<div id="fieldBox">
+						<input type="text" id="fieldInput">
+						<button id="revertButton">
+							<i class="fa-solid fa-backward"></i>
+						</button>
+						<button id="updateButton">
+							<i class="fa-solid fa-wrench"></i>
+						</button>
+					</div>
 				</template>
-			</form>
+			</div>
 			<button id="submitButton">Enviar</button>
 			<button id="returnButton">Voltar atrás</button>
 		</div>

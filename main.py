@@ -89,6 +89,12 @@ class Cards:
     def get_cards():
         return successful_answer(Project.current().anki_file.get_json_compatible_cards())
 
+    @STATE.app.get("/json_card_by_index")
+    @response_func
+    def get_card_by_index():
+        index = int(request.args.get("index"))
+        return Project.current().anki_file.get_json_compatible_cards()[index]
+
     @STATE.app.post("/addcard")
     @response_func
     def addcard():
