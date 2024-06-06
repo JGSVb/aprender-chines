@@ -7,6 +7,7 @@ const showAnkiCardsDialog = {
 	ankiCardsContainer: null,
 	counterElement: null,
 	filterCards: null,
+	json: null,
 	filter: "",
 
 	showDeleteCardConfirmation: function(card, index){
@@ -44,10 +45,10 @@ const showAnkiCardsDialog = {
 		overlay.setContent(deleteConfirmation);
 	},
 
-	populate: function(json){
+	populate: function(){
 		this.ankiCardsContainer.innerHTML = "";
 
-		data = json.getData();
+		data = this.json.getData();
 		data.reverse();
 
 		this.counterElement.innerHTML = data.length;
@@ -110,17 +111,15 @@ const showAnkiCardsDialog = {
 
 		this.filterCards.addEventListener("input", function(input){
 			this.filter = input.target.value;
-
-			protocol.getJsonCards(
-				notificationOptions={
-					notifySuccess: false
-				}).then(this.populate.bind(this));
-
+			this.populate();
 		}.bind(this));
 
 		overlay.setVisible(true);
 		overlay.setContent(this.dialog);
 
-		protocol.getJsonCards().then(this.populate.bind(this));
+		protocol.getJsonCards().then(function(data){
+			this.json = data;
+			this.populate();
+		}.bind(this));
 	}
 };
