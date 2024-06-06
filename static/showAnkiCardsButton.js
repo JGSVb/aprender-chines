@@ -6,6 +6,8 @@ const showAnkiCardsDialog = {
 	ankiCardsDialog: null,
 	ankiCardsContainer: null,
 	counterElement: null,
+	filterCards: null,
+	filter: "",
 
 	showDeleteCardConfirmation: function(card, index){
 		const deleteConfirmation = document.importNode(showAnkiCardsDialog.deleteAnkiCardConfirmationTemplate.content, true);
@@ -52,6 +54,18 @@ const showAnkiCardsDialog = {
 
 		for(let i = 0; i < data.length; i++){
 			const entry = data[i];
+			let goOn = false;
+
+			for(const x of entry.values){
+				if(x.toLowerCase().includes(this.filter.toLowerCase())){
+					goOn = true;
+					break;
+				}
+			}
+
+			if(!goOn){
+				continue;
+			}
 
 			const clone = document.importNode(this.entryTemplate.content, true);
 			const card = new AnkiCard(entry.values, entry.id);
@@ -85,12 +99,24 @@ const showAnkiCardsDialog = {
 		}
 	},
 
+
 	show: function() {
 		this.dialog = document.importNode(this.dialogTemplate.content, true);
 		this.ankiCardsDialog = this.dialog.getElementById("ankiCardsDialog");
 		this.ankiCardsContainer = this.dialog.getElementById("ankiCardsContainer");
 		this.entryTemplate = this.dialog.getElementById("entryTemplate");
 		this.counterElement = this.dialog.getElementById("counter");
+		this.filterCards = this.dialog.getElementById("filterCards");
+
+		this.filterCards.addEventListener("input", function(input){
+			this.filter = input.target.value;
+
+			protocol.getJsonCards(
+				notificationOptions={
+					notifySuccess: false
+				}).then(this.populate.bind(this));
+
+		}.bind(this));
 
 		overlay.setVisible(true);
 		overlay.setContent(this.dialog);
