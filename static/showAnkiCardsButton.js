@@ -108,6 +108,7 @@ const showAnkiCardsDialog = {
 		this.entryTemplate = this.dialog.getElementById("entryTemplate");
 		this.counterElement = this.dialog.getElementById("counter");
 		this.filterCards = this.dialog.getElementById("filterCards");
+		this.filter = "";
 
 		this.filterCards.addEventListener("input", function(input){
 			this.filter = input.target.value;
