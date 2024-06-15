@@ -54,4 +54,41 @@ async function updateDictionary(selId) {
 	});
 }
 
+const chineseTextWords = document.getElementById("chineseTextWords");
+
+document.onselectionchange = () => {
+
+	selectionId++;
+
+	var selection = getSelectedTextWithinDiv("chineseTextWords");
+
+	if(selection.length == 0) {
+		return;
+	}
+
+	// TODO: remover esta linha abaixo
+	chineseSegment = selection;
+
+	protocol.getJsonCards(notificationOptions={
+		notifySuccess: false,
+	}).then(function(data){
+		data = data.getData();
+		for(const c of data){
+			if(c.values[0] == selection){
+				chineseTextWords.classList.add("selection-already-exists");
+				return;
+			}
+		}
+		chineseTextWords.classList.remove("selection-already-exists");
+	}.bind(selection));
+
+	chineseText.selection = selection;
+	document.getElementById("preview").textContent = chineseSegment;
+
+	updateDictionary(selectionId);
+	translator.show();
+
+	document.getElementById("createAnkiCardButtonChinese").innerHTML = chineseText.selection;
+};
+
 

@@ -34,6 +34,7 @@
 	--notificationbggood: rgb(50, 150, 70);
 	--notificationborderbad: 2px solid rgb(100, 50, 20);
 	--notificationbgbad: rgb(150, 70, 50);
+	--selection-already-exists-bg: rgba(255,0,0,0.5);
 }
 
 * {
@@ -405,4 +406,9 @@ input {
 
 #overlayContent {
 	width: 100%;
+}
+
+.selection-already-exists ::selection {
+	background-color: var(--selection-already-exists-bg);
+
 }

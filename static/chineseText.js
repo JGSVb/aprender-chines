@@ -80,7 +80,7 @@ const chineseText = {
 	showText: async function(){
 		if(this.currString == this.prevString){
 			return;
-		}
+}
 
 		this.chineseWordsBox.innerHTML = "";
 		this.pinyinWordsBox.innerHTML = "";
@@ -144,24 +144,3 @@ function getSelectedTextWithinDiv(parentDivId) {
         return selectedText;
 }
 
-document.onselectionchange = () => {
-
-	selectionId++;
-
-	var selection = getSelectedTextWithinDiv("chineseTextWords");
-
-	if(selection.length == 0) {
-		return;
-	}
-
-	// TODO: remover esta linha abaixo
-	chineseSegment = selection;
-
-	chineseText.selection = selection;
-	document.getElementById("preview").textContent = chineseSegment;
-
-	updateDictionary(selectionId);
-	translator.show();
-
-	document.getElementById("createAnkiCardButtonChinese").innerHTML = chineseText.selection;
-};
