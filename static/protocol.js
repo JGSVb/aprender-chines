@@ -91,8 +91,12 @@ const protocol = {
 		return await this.post("/cut_chinese_string", text, notificationOptions);
 	},
 
-	getTimedText: async function(notificationOptions=notificationOptionsNoNotify){
-		return await this.get("/timedtext", notificationOptions);
+	getTimedtext: async function(lang, notificationOptions=notificationOptionsNoNotify){
+		return await this.get("/timedtext?lang=" + lang, notificationOptions);
+	},
+
+	listTimedtext: async function(notificationOptions=notificationOptionsNoNotify){
+		return await this.get("/list_timedtext", notificationOptions);
 	},
 
 	pinyin: async function(chineseText, notificationOptions=notificationOptionsNoNotify){

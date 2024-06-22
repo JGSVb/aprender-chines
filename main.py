@@ -4,7 +4,7 @@ import jieba
 from dotenv import load_dotenv
 from requests import get as req_get
 from urllib.parse import urlparse, parse_qs
-from flask import Flask, render_template, request, jsonify, Response, redirect
+from flask import Flask, render_template, request, jsonify, Response, redirect, send_from_directory
 from utils import *
 from typing import List
 
@@ -14,7 +14,14 @@ from protocol import *
 
 _v = verbose
 
-proj_conf = ProjectConfig("Projetos", "config.json", "anki.txt")
+proj_conf = ProjectConfig(
+    projects_folder="Projetos",
+    json_filename="config.json",
+    anki_filename="anki.txt",
+    timedtext_folder="timedtext",
+    timedtext_prefix="timedtext_",
+    timedtext_suffix=".json")
+
 Project.configure(proj_conf)
 
 class STATE:
@@ -26,8 +33,19 @@ def get_youtube_video_id(youtube_video_url):
     query = urlparse(youtube_video_url).query
     return parse_qs(query)["v"][0]
 
+
+@STATE.app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(STATE.app.root_path, "static"),
+                               "favicon.ico", mimetype="image/vnd.microsoft.icon")
+
 @STATE.app.get("/")
 def main_page():
+    force_main = request.args.get("force_main")
+
+    if Project.current() and not force_main:
+        return redirect("/project/" + Project.current().name)
+
     projects = Project.get_projects()
     projects.sort(key=Project.cmp_func_last_access)
     projects.reverse()
@@ -120,11 +138,25 @@ def timedtext():
         url = request.json["url"]
         parse = urlparse(url)
         parsed_query = parse_qs(parse.query)
-        print(request.json)
+        lang = parsed_query["lang"][0]
         STATE.timedtext = request.json["timedtext"]
+        Project.current().save_timedtext(lang, request.json["timedtext"])
 
     if request.method == "GET":
-        return STATE.timedtext
+        lang = request.args.get("lang")
+        if not lang:
+
+            if not STATE.timedtext:
+                STATE.timedtext = Project.current().load_first_timedtext()
+
+            return STATE.timedtext
+        else:
+            return Project.current().load_timedtext(lang)
+
+@STATE.app.get("/list_timedtext")
+@response_func
+def list_timedtext():
+    return Project.current().list_timedtext()
 
 load_dotenv()
 CX_ID = os.environ["CX_ID"]
