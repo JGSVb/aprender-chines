@@ -100,6 +100,23 @@
 			</div>
 		</template>
 
+		<template id="cedictEntryTemplate">
+			<div class="entry">
+				<div id="simplified"></div>
+				<div id="traditional"></div>
+				<div id="pinyin"></div>
+				<div id="english"></div>
+			</div>
+		</template>
+
+		<template id="ptdictEntryTemplate">
+			<div class="entry">
+				<div id="chinese"></div>
+				<div id="pinyin"></div>
+				<div id="portuguese"></div>
+			</div>
+		</template>
+
 	</head>
 	<body>
 
@@ -175,6 +192,11 @@
 
 		</div>
 
+		<div class="box" id="ankiButtonsBox">
+			<button onclick="addAnkiCardButton()" id="createAnkiCardButton" class="create-anki-card">Criar cartão anki <div id="createAnkiCardButtonChinese"></div></button>
+			<button onclick="showAnkiCardsDialog.show()" id="showAnkiCardsButton">Listar cartões</button>
+		</div>
+
 		<div class="box" id="translator-box">
 			<div class="translator">
 				<div>
@@ -191,19 +213,31 @@
 
 		<div class="box" id="dictionaryBox">
 			<input id="searchDict">
-			<div>
-				<div class="dictEnglish">
-					banana
+			<div id="resultBox">
+				<div id="exactMatch">
+					<div class="cedict">
+						<img src="{{ url_for('static',filename='images/uk.png') }}">
+					</div>
+					<div class="ptdict">
+						<img src="{{ url_for('static',filename='images/pt.png') }}">
+					</div>
+					<div class="glosbe">
+						<img src="{{ url_for('static',filename='images/glosbe.png') }}">
+					</div>
+					<div class="ankidict">
+					</div>
 				</div>
-				<div class="dictPortuguese">
-					banana
+				<div id="partialMatch">
+					<div class="cedict">
+					</div>
+					<div class="ptdict">
+					</div>
+					<div class="glosbe">
+					</div>
+					<div class="ankidict">
+					</div>
 				</div>
 			</div>
-		</div>
-
-		<div class="box" id="ankiButtonsBox">
-			<button onclick="addAnkiCardButton()" id="createAnkiCardButton" class="create-anki-card">Criar cartão anki <div id="createAnkiCardButtonChinese"></div></button>
-			<button onclick="showAnkiCardsDialog.show()" id="showAnkiCardsButton">Listar cartões</button>
 		</div>
 
 		<script>
@@ -222,6 +256,7 @@
 		<script src="{{url_for('static', filename='Translator.js')}}"></script>
 		<script src="{{url_for('static', filename='ImageSearch.js')}}"></script>
 		<script src="{{url_for('static', filename='script.js')}}"></script>
+		<script src="{{url_for('static', filename='Dictionary.js')}}"></script>
 		<script>
 			function copyCurrText(){
 				navigator.clipboard.writeText(chineseText.currString);

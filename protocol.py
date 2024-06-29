@@ -32,7 +32,7 @@ def response_func(f):
         try:
             data = f(*args, **kwargs)
         except Exception as e:
-            traceback.print_exc(e)
+            # traceback.print_exc(e)
             return unsuccessful_answer(str(e))
         else:
             return successful_answer(data)

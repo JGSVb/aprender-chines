@@ -2,6 +2,20 @@ import os
 import json
 import random
 
+DECK_CARD = []
+DECK_CARD_FILE = "deck.txt"
+
+try:
+    with open(DECK_CARD_FILE, "r") as file:
+        lines = file.readlines()
+
+        for x in lines:
+            DECK_CARD.append([e.strip() for e in x.split("\t")])
+except FileNotFoundError:
+    print(f"Não existe ficheiro chamado '{DECK_CARD_FILE}' que se refira a uma base de dados anki.")
+else:
+    print(f"Carregado ficheiro de base de dados Anki '{DECK_CARD_FILE}'.")
+
 DEFAULT_ANKI_FORMAT = 5
 
 class AnkiCard:
@@ -63,9 +77,9 @@ class AnkiFile:
 
         for l in lines:
             values = l.split(self.separator)
-            values[-1] = values[-1][:-1] # remover o último caracter porque vai ser sempre "\n" devido ao formato do ficheiro
+            values[-1] = values[-1].strip()
             card = AnkiCard(values, self.format)
-            self.add_card(card)
+            self._add_card(card)
 
     def write(self):
         lines = []
@@ -102,20 +116,28 @@ class AnkiFile:
             if c.values[0] == card.values[0]:
                 raise Exception(f"Já existe uma carta cujo values[0] seja {card.values[0]}")
 
+        # DECK_CARD definido no início deste ficheiro
+        for c in DECK_CARD:
+            if c[0] == card.values[0]:
+                raise Exception(f"Já existe uma carta cujo values[0] seja {card.values[0]} na base de dados anki: {c}")
+
     def post_add_card_hook(self):
         self.write()
 
-    def add_card(self, card : AnkiCard):
-        self.before_add_card_hook(card)
-
+    def _add_card(self, card : AnkiCard):
         id = self.get_new_card_id()
         card.id = id
 
         self.cards.append(card)
 
-        self.post_add_card_hook()
-
         card._lock()
+
+    def add_card(self, card : AnkiCard):
+        self.before_add_card_hook(card)
+
+        self._add_card(card)
+
+        self.post_add_card_hook()
 
     def post_delete_card_hook(self):
         self.write()

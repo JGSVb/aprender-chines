@@ -107,6 +107,9 @@ document.onselectionchange = () => {
 	translator.show();
 
 	document.getElementById("createAnkiCardButtonChinese").innerHTML = chineseText.selection;
+
+	Gdict.search_input.value = selection
+	Gdict.oninput()
 };
 
 

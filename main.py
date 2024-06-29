@@ -11,6 +11,13 @@ from typing import List
 from anki_utils import *
 from project import *
 from protocol import *
+from glosbe import GlosbeDict
+from dictionaries import *
+
+pt_dict = PTDict("dictionary.json")
+ce_dict = CEDict("cedict_ts.u8")
+glosbe = GlosbeDict("glosbe", "zh", "pt")
+anki_dict = AnkiDict("deck.txt")
 
 _v = verbose
 
@@ -72,6 +79,23 @@ def dictionary():
     query = request.args.get("query")
     entries = get_dictionary_for(query)
     return jsonify(entries)
+
+@STATE.app.get("/definition")
+@response_func
+def definition():
+    query = request.args.get("query")
+    g = glosbe.search(query)
+    c = ce_dict.search(query)
+    p = pt_dict.search(query)
+    a = anki_dict.search(query)
+
+    return {
+        "query": query,
+        "glosbe": g,
+        "cedict": c,
+        "ptdict": p,
+        "anki": a
+        }
 
 @STATE.app.post("/translate")
 @response_func

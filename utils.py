@@ -40,8 +40,10 @@ def get_dictionary_for(query, truncate=6):
     pt_entries = pt_dict.search(query)
     en_entries = cedict.search(query)
 
-    entries = pt_entries
-    entries.extend(en_entries)
+    entries = pt_entries[0]
+    entries.extend(en_entries[0])
+    entries.extend(pt_entries[1])
+    entries.extend(en_entries[1])
 
     if len(entries) > truncate:
         t = entries[:truncate + 1]

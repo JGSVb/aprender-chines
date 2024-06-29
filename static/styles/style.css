@@ -1,6 +1,6 @@
 /* TODO: trocar white, black por cores mais neutras 
  * tipo black passa pra um roxo escuro 
- * e    white passa pra um amarelo*/
+ * e		white passa pra um amarelo*/
 
 /* Tema claro */
 /*
@@ -150,29 +150,29 @@ button:active {
 }
 
 #overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1;
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.5);
+		display: none;
+		justify-content: center;
+		align-items: center;
+		z-index: 1;
 }
 
 #overlayDialog {
-    background-color: var(--dialogbg);
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    width: 50%;
+		background-color: var(--dialogbg);
+		padding: 20px;
+		border-radius: 8px;
+		text-align: center;
+		width: 50%;
 
-    display: flex;
-    flex-flow: column;
-    justify-content: center;
-    align-items: center;
+		display: flex;
+		flex-flow: column;
+		justify-content: center;
+		align-items: center;
 }
 
 #overlayDialog * {
@@ -266,9 +266,9 @@ input {
 }
 
 .dropdown {
-  float: right;
-  position: relative;
-  display: inline-block;
+	float: right;
+	position: relative;
+	display: inline-block;
 }
 
 .dropdown-content {
@@ -545,11 +545,111 @@ input {
 	animation-iteration-count: 1;
 }
 
-#dictionaryBox div {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
+#dictionaryBox > div {
+	display: flex;
+	flex-direction: column;
+	background-color: black;
+	border-radius: 10px;
 }
 
-#dictionaryBox input {
-	all: unset;
+#dictionaryBox {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+#searchDict {
+	align-self: center;
+}
+
+#partialMatch, #exactMatch {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+	grid-template-rows: 1fr;
+	background: var(--buttonbg);
+}
+
+#exactMatch {
+	border-radius: 10px 10px 0px 0px;
+}
+
+#partialMatch {
+	border-radius: 0px 0px 10px 10px;
+	box-shadow: inset 0px 4px 5px rgba(0,0,0,0.4),
+		inset 0px -4px 5px rgba(0,0,0,0.4);
+	opacity: 0.9;
+	transition-duration: 0.06s;
+	transition-timing-function: ease-in-out;
+}
+
+#partialMatch:hover {
+	opacity: 1;
+}
+
+#exactMatch .entry {
+	box-shadow: unset;
+}
+
+#exactMatch {
+	background-image: linear-gradient(to bottom, transparent 90%, rgba(0,0,0,0.1));
+}
+
+#partialMatch > div {
+	overflow-y: scroll;
+	max-height: 300px;
+}
+
+#partialMatch > div:not(:last-child) {
+	border-right: 1px solid black;
+}
+
+#exactMatch > div:not(:last-child) {
+	border-right: 1px solid black;
+}
+
+.entry {
+	display: grid;
+	gap: 10px;
+	display: flex;
+	flex-wrap: wrap;
+	padding: 10px;
+}
+
+div .entry:not(:last-child) {
+	border-bottom: 1px solid rgba(0,0,0,0.4);
+}
+
+.entry * {
+	font-size: 20px;
+	align-self: center;
+}
+
+.entry #simplified, .entry #chinese {
+	font-size: 40px;
+	font-weight: normal;
+	color: white;
+}
+
+.entry #pinyin {
+	font-weight: bold;
+}
+
+.entry #pinyin, .entry #chinese, .entry #simplified {
+	filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3))
+}
+
+.entry #traditional {
+	display: none;
+}
+
+#exactMatch > div img {
+	width: 24px;
+	height: 24px;
+	position: absolute;
+	margin: 5px;
+	border-radius: 100%;
+}
+
+#exactMatch div div:first-child {
+	padding-top: 10px;
 }

@@ -3,5 +3,5 @@ jieba==0.42.1
 flask==3.0.2
 deep_translator==1.11.4
 pinyin_tone_converter==1.0.2
-pypdf==4.2.0
 python-dotenv==1.0.1
+beautifulsoup4==4.12.3

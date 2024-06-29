@@ -119,6 +119,11 @@ const protocol = {
 
 		return await this.get("/image_search?q="+query,
 			notificationOptions);
+	},
+
+	getDefinition: async function(query, notificationOptions=notificationOptionsNoNotify){
+		return await this.get("/definition?query="+query,
+			notificationOptions);
 	}
 
 }

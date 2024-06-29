@@ -9,24 +9,24 @@ class Dictionary:
         return query in e["chinese"]
 
     @staticmethod
-    def key_func_eq(query, e):
-        if e["chinese"] == query:
-            return 0
-
-        return 99999
+    def select_func_eq(query, e):
+        return query.strip() == e["chinese"].strip()
 
     def load_data(self):
         raise NotImplementedError()
 
     @lru_cache()
-    def search(self, query, select_func, key_func):
+    def search(self, query, *select_func):
         result = []
 
-        for e in self.data:
-            if select_func(query, e):
-                result.append(e)
+        for i,s in enumerate(select_func):
+            curr = []
 
-        result.sort(key=lambda x: key_func(query, x))
+            for e in self.data:
+                if s(query, e):
+                    curr.append(e)
+
+            result.append(curr)
 
         return result
 
@@ -44,8 +44,14 @@ class PTDict(Dictionary):
         with open(self.filename, "r") as file:
             self.data = json.load(file)
 
-    def search(self, query, select_func=Dictionary.select_func_contains, key_func=Dictionary.key_func_eq):
-        return super().search(query, select_func, key_func)
+    def search(self, query, *select_func):
+        if not select_func:
+            select_func = (
+                    Dictionary.select_func_eq,
+                    Dictionary.select_func_contains
+                    )
+
+        return super().search(query, *select_func)
 
 
 class CEDict(Dictionary):
@@ -58,11 +64,41 @@ class CEDict(Dictionary):
         return query in e["simplified"] or query in e["traditional"]
 
     @staticmethod
-    def key_func_eq(query, e):
-        if e["simplified"] == query or e["traditional"] == query:
-            return 0
+    def select_func_eq(query, e):
+        return query.strip() == e["simplified"].strip() or query.strip() == e["traditional"].strip()
 
-        return 99999
+    def search(self, query, *select_func):
+        if not select_func:
+            select_func = (
+                    CEDict.select_func_eq,
+                    CEDict.select_func_contains
+                    )
 
-    def search(self, query, select_func=select_func_contains, key_func=key_func_eq):
-        return super().search(query, select_func, key_func)
+        return super().search(query, *select_func)
+
+class AnkiDict(Dictionary):
+    def load_data(self):
+        self.data = []
+
+        with open(self.filename, "r") as file:
+            lines = file.readlines()
+
+            for x in lines:
+                self.data.append([e.strip() for e in x.split("\t")])
+
+    @staticmethod
+    def select_func_contains(query, e):
+        return query in e[0]
+
+    @staticmethod
+    def select_func_eq(query, e):
+        return query.strip() == e[0]
+
+    def search(self, query, *select_func):
+        if not select_func:
+            select_func = (
+                    AnkiDict.select_func_eq,
+                    AnkiDict.select_func_contains
+                    )
+
+        return super().search(query, *select_func)
