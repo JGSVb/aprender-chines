@@ -13,14 +13,17 @@ const showAnkiCardsDialog = {
 	showDeleteCardConfirmation: function(card, index){
 		const deleteConfirmation = document.importNode(showAnkiCardsDialog.deleteAnkiCardConfirmationTemplate.content, true);
 
-		deleteConfirmation.getElementById("return").onclick = function(){
-			showAnkiCardsDialog.show();
-		};
-
-		deleteConfirmation.getElementById("confirm").onclick = function(){
-			protocol.deleteCard(card);
-			showAnkiCardsDialog.show();
-		};
+		overlay.setButtons({
+				label: "Voltar atrás",
+				onclick: showAnkiCardsDialog.show 
+			},
+			{
+				label: "Confirmar",
+				onclick: function(){
+					protocol.deleteCard(card)
+					showAnkiCardsDialog.show()
+				}
+		}) 
 
 		const fieldContainer = deleteConfirmation.getElementById("ankiCard");
 		const cardFieldsTemplate = card.getFieldsTemplate();

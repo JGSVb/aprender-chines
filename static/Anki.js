@@ -1,4 +1,5 @@
-const DEFAULT_ANKI_FORMAT = 5;
+// const DEFAULT_ANKI_FORMAT = 6;
+const DEFAULT_ANKI_FORMAT = 6;
 const DEFAULT_ANKI_FIELDS_TEMPLATE = [
 	["hanzi", "汉字", "text", {
 		revertButton: false,
@@ -25,7 +26,11 @@ const DEFAULT_ANKI_FIELDS_TEMPLATE = [
 	["meaning", "significado", "text", {
 		revertButton: false,
 		updateButton: false,
-	}],
+	}] /*,
+	["image", "imagem", "image", {
+		revertButton: false,
+		updateButton: false,
+	}]*/
 ];
 
 class AnkiCard {

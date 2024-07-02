@@ -8,8 +8,15 @@ class Dictionary {
 		this.ptdict_box_exact = document.querySelector("#exactMatch .ptdict")
 		this.ptdict_box_partial = document.querySelector("#partialMatch .ptdict")
 
+		this.glosbe_entry_template = document.getElementById("glosbeEntryTemplate")
+		this.glosbe_less_frequent_entry_template = document.getElementById("glosbeLessFrequentEntryTemplate")
+		this.glosbe_box_exact = document.querySelector("#exactMatch .glosbe")
+		this.glosbe_box_partial = document.querySelector("#partialMatch .glosbe")
+
+		this.not_found_entry_template = document.querySelector("#notFoundEntryTemplate")
+
 		this.search_input = document.getElementById("searchDict")
-		this.search_input.oninput = this.oninput.bind(this)
+		this.search_input.oninput = debounce(this.oninput.bind(this), 1000)
 
 		this.entries = {}
 		this.query = null
@@ -20,7 +27,7 @@ class Dictionary {
 			return false
 		}
 
-		this.entries = await protocol.getDefinition(query).then(x => {return x.getData()})
+		this.entries = await protocol.getDefinition(query).then((x) => {return x.getData()})
 		this.query = query
 
 		return true
@@ -29,6 +36,7 @@ class Dictionary {
 	clean_entries(){
 		this.cedict_box_partial.innerHTML = ""
 		this.ptdict_box_partial.innerHTML = ""
+		this.glosbe_box_partial.innerHTML = ""
 
 		let img = this.cedict_box_exact.getElementsByTagName("img")[0]
 		this.cedict_box_exact.innerHTML = ""
@@ -37,6 +45,10 @@ class Dictionary {
 		img = this.ptdict_box_exact.getElementsByTagName("img")[0]
 		this.ptdict_box_exact.innerHTML = ""
 		this.ptdict_box_exact.appendChild(img)
+
+		img = this.glosbe_box_exact.getElementsByTagName("img")[0]
+		this.glosbe_box_exact.innerHTML = ""
+		this.glosbe_box_exact.appendChild(img)
 
 	}
 
@@ -47,6 +59,17 @@ class Dictionary {
 		elem.getElementById("traditional").innerHTML = e.traditional
 		elem.getElementById("pinyin").innerHTML = e.pinyin
 		elem.getElementById("english").innerHTML = e.english
+
+		elem.getElementById("translateBtn").onclick = (event) => {
+			let target = event.target
+			let parent = event.target.parentElement
+
+			target.innerHTML = "a traduzir ..."
+
+			protocol.translate(e.english, "en", "pt").then((x) => {
+				parent.innerHTML = x.getData()
+			})
+		}
 
 		return elem
 	}
@@ -61,10 +84,44 @@ class Dictionary {
 		return elem
 	}
 
+	get_glosbe_element(e){
+
+		const elem = document.importNode(this.glosbe_entry_template.content, true)
+		elem.getElementById("meaning").innerHTML = e.meaning
+		if(e.part_of_speech){
+			elem.getElementById("partOfSpeech").innerHTML = e.part_of_speech.join(" ")
+		}
+		if(e.example){
+			elem.getElementById("example").innerHTML = e.example
+		}
+		if(e.example_translation){
+			elem.getElementById("translation").innerHTML = e.example_translation
+		}
+
+		return elem
+		
+	}
+
+	get_glosbe_less_frequent_element(w){
+
+		const elem = document.importNode(this.glosbe_less_frequent_entry_template.content, true)
+		elem.getElementById("meaning").innerHTML = w
+
+		return elem
+	}
+
+	get_not_found_entry_element(){
+		return document.importNode(this.not_found_entry_template.content, true)
+	}
+
 	populate_cedict(){
-		for(const e of this.entries.cedict[0]){
-			const elem = this.get_cedict_element(e)
-			this.cedict_box_exact.appendChild(elem)
+		if(this.entries.cedict[0].length){
+			for(const e of this.entries.cedict[0]){
+				const elem = this.get_cedict_element(e)
+				this.cedict_box_exact.appendChild(elem)
+			}
+		} else {
+			this.cedict_box_exact.appendChild(this.get_not_found_entry_element())
 		}
 
 		for(const e of this.entries.cedict[1]){
@@ -75,9 +132,13 @@ class Dictionary {
 	}
 
 	populate_ptdict(){
-		for(const e of this.entries.ptdict[0]){
-			const elem = this.get_ptdict_element(e)
-			this.ptdict_box_exact.appendChild(elem)
+		if(this.entries.ptdict[0].length){
+			for(const e of this.entries.ptdict[0]){
+				const elem = this.get_ptdict_element(e)
+				this.ptdict_box_exact.appendChild(elem)
+			}
+		} else {
+			this.ptdict_box_exact.appendChild(this.get_not_found_entry_element())
 		}
 
 		for(const e of this.entries.ptdict[1]){
@@ -87,10 +148,31 @@ class Dictionary {
 
 	}
 
+	populate_glosbe(){
+		const result = this.entries.glosbe.result
+		const less_freq = result.less_frequent
+
+		if(result.entries.length){
+			for(const e of result.entries){
+				const elem = this.get_glosbe_element(e)
+				this.glosbe_box_exact.appendChild(elem)
+			}
+		} else {
+			this.glosbe_box_exact.appendChild(this.get_not_found_entry_element())
+		}
+
+		for(const w of less_freq){
+			let elem = this.get_glosbe_less_frequent_element(w)
+			this.glosbe_box_partial.appendChild(elem)
+		}
+
+	}
+
 	populate(){
 		this.clean_entries()
 		this.populate_cedict()
 		this.populate_ptdict()
+		this.populate_glosbe()
 	}
 
 	show(){
@@ -109,10 +191,4 @@ class Dictionary {
 }
 
 let Gdict = new Dictionary()
-
-async function test(){
-	await Gdict.update("金")
-	Gdict.show()
-}
-
-test()
+Gdict.oninput()

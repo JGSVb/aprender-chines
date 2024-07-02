@@ -75,6 +75,8 @@ function getSelectedTextWithinDiv(parentDivId) {
         return selectedText;
 }
 
+const Gdict_oninput_debounce = debounce(Gdict.oninput.bind(Gdict), 1000)
+
 document.onselectionchange = () => {
 
 	selectionId++;
@@ -109,7 +111,7 @@ document.onselectionchange = () => {
 	document.getElementById("createAnkiCardButtonChinese").innerHTML = chineseText.selection;
 
 	Gdict.search_input.value = selection
-	Gdict.oninput()
+	Gdict_oninput_debounce()
 };
 
 

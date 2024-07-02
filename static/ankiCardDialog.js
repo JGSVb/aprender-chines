@@ -5,7 +5,6 @@ const ankiCardDialog = {
 	selector: null,
 	inputBox: null,
 	inputArray: null,
-	returnButton: null,
 	title: null,
 	card: null,
 	showSelector: true,
@@ -136,7 +135,6 @@ const ankiCardDialog = {
 		this.dialog = document.importNode(this.dialogTemplate.content, true);
 		this.selector = this.dialog.getElementById("dictionaryEntrySelector");
 		this.inputBox = this.dialog.getElementById("inputBox");
-		this.submitButton = this.dialog.getElementById("submitButton");
 
 		this.showSelector = showSelector;
 		this.returnAction = returnAction;
@@ -145,21 +143,25 @@ const ankiCardDialog = {
 			this.selector.style.display = "none";
 		}
 
-		this.returnButton = this.dialog.getElementById("returnButton");
-
-		if(this.returnAction == null){
-			this.returnButton.style.display = "none";
-		} else {
-			this.returnButton.onclick = returnAction;
-		}
-
-		this.submitButton.onclick = submitAction.bind(this);
 
 		this.title = title;
 
 		this.dialog.getElementById("title").innerHTML = title;
 
 		this.populate();
+
+		let buttons = [{
+				label: "enviar",
+				onclick: submitAction.bind(this) }]
+
+		if(this.returnAction){
+			buttons.push({
+				label: "Voltar atrás",
+				onclick: returnAction.bind(this)
+			})
+		}
+
+		overlay.setButtons(...buttons)
 
 		overlay.setContent(this.dialog);
 		overlay.show();
@@ -172,6 +174,7 @@ async function addAnkiCardButton(){
 		return resp.getData();
 	});
 	const n = new AnkiCard(["", "", chineseText.currString, translation, ""]);
+	// const n = new AnkiCard(["", "", chineseText.currString, translation, "", ""]);
 	ankiCardDialog.setCard(n);
 	ankiCardDialog.show();
 

@@ -46,8 +46,6 @@
 						</div>
 					</template>
 				</div>
-				<button id="submitButton">Enviar</button>
-				<button id="returnButton">Voltar atrás</button>
 			</div>
 		</template>
 
@@ -83,20 +81,29 @@
 					<div id="fieldValue">
 					</div>
 				</template>
-			<div>
-				<button id="confirm">Sim</button>
-				<button id="return">Voltar atrás</button>
-			</div>
-
 		</template>
 
 		<template id="imageSearchTemplate">
 			<template id="imageItem">
-				<div>
-					<img>
+				<div id="item">
+					<img id="img">
+					<div id="imageOverlay">
+						<div id="infoBox">
+							<div id="info">
+							</div>
+							<button id="selectButton">
+								<i class="fa-solid fa-check"></i>
+							</button>
+						</div>
+					</div>
 				</div>
 			</template>
-			<div id="imageResultBox">
+			<div>
+				<input id="searchInput">
+				<div id="outerBox">
+					<div id="imageResultBox"></div>
+					<div id="shadow"></div>
+				</div>
 			</div>
 		</template>
 
@@ -105,7 +112,12 @@
 				<div id="simplified"></div>
 				<div id="traditional"></div>
 				<div id="pinyin"></div>
-				<div id="english"></div>
+				<div id="meaning">
+					<div id="english"></div>
+					<div id="portuguese">
+						<button id="translateBtn">Traduzir</button>
+					</div>
+				</div>
 			</div>
 		</template>
 
@@ -117,6 +129,31 @@
 			</div>
 		</template>
 
+		<template id="glosbeEntryTemplate">
+			<div class="entry">
+				<div id="word">
+					<div id="meaning"></div>
+					<div id="partOfSpeech"></div>
+				</div>
+				<div id="exampleBox">
+					<div id="example"></div>
+					<div id="translation"></div>
+				</div>
+			</div>
+		</template>
+		
+		<template id="glosbeLessFrequentEntryTemplate">
+			<div class="entry">
+				<div id="meaning"></div>
+			</div>
+		</template>
+
+		<template id="notFoundEntryTemplate">
+			<div class="entry" id="notFoundEntry">
+				<div>Não foi possível encontrar resultados</div>
+			</div>
+		</template>
+
 	</head>
 	<body>
 
@@ -125,10 +162,12 @@
 
 		<div id="overlay">
 			<div id="overlayDialog">
-			<div id="overlayContent">
-			</div>
+				<div id="overlayContent">
+				</div>
 
-			<button onclick="overlay.hide()">Fechar</button>
+				<div id="overlayButtonBox">
+					<button id="overlayCloseButton" onclick="overlay.hide()">Fechar</button>
+				</div>
 			</div>
 		</div>
 
@@ -224,8 +263,6 @@
 					<div class="glosbe">
 						<img src="{{ url_for('static',filename='images/glosbe.png') }}">
 					</div>
-					<div class="ankidict">
-					</div>
 				</div>
 				<div id="partialMatch">
 					<div class="cedict">
@@ -233,8 +270,6 @@
 					<div class="ptdict">
 					</div>
 					<div class="glosbe">
-					</div>
-					<div class="ankidict">
 					</div>
 				</div>
 			</div>
@@ -244,6 +279,7 @@
 			const GLOBAL_VIDEO_ID = "{{ video_id }}";
 			const GLOBAL_VIDEO_URL = "{{ video_url }}";
 		</script>
+		<script src="{{url_for('static', filename='utils.js')}}"></script>
 		<script src="{{url_for('static', filename='assert.js')}}"></script>
 		<script src="{{url_for('static', filename='protocol.js')}}"></script>
 		<script src="{{url_for('static', filename='Anki.js')}}"></script>
@@ -255,8 +291,8 @@
 		<script src="{{url_for('static', filename='chineseText.js')}}"></script>
 		<script src="{{url_for('static', filename='Translator.js')}}"></script>
 		<script src="{{url_for('static', filename='ImageSearch.js')}}"></script>
-		<script src="{{url_for('static', filename='script.js')}}"></script>
 		<script src="{{url_for('static', filename='Dictionary.js')}}"></script>
+		<script src="{{url_for('static', filename='script.js')}}"></script>
 		<script>
 			function copyCurrText(){
 				navigator.clipboard.writeText(chineseText.currString);

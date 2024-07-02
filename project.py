@@ -6,259 +6,187 @@ from anki_utils import *
 
 class ProjectConfig:
 
-    def __init__(self,
-                 projects_folder : str,
-                 json_filename : str,
-                 anki_filename : str,
-                 timedtext_folder : str,
-                 timedtext_prefix : str,
-                 timedtext_suffix : str):
+	root_folder = "Projetos"
 
-        self._locked = False
-        self.projects_folder = os.path.abspath(projects_folder)
-        self.json_filename = json_filename
-        self.anki_filename = anki_filename
-        self.timedtext_folder = timedtext_folder
-        self.timedtext_prefix = timedtext_prefix
-        self.timedtext_suffix = timedtext_suffix
+	timedtext_folder = "./timedtext"
+	images_folder = "./data/images"
 
-        def erase_init():
-            raise Exception("Só pode haver uma configuração")
+	folders = [
+			timedtext_folder,
+			images_folder]
 
-        ProjectConfig.__init__ = erase_init
-        self._lock()
+	anki_file = "anki.txt"
+	config_file = "config.json"
 
-    def __setattr__(self, name, value):
-        if name != "_locked" and self._locked:
-            raise Exception("A configuração está trancada")
-        else:
-            super().__setattr__(name, value)
+	files = [
+			anki_file,
+			config_file]
 
-    def _lock(self):
-        self._locked = True
+	timedtext_file_prefix = "timedtext_"
+	timedtext_file_suffix = ".json"
 
 
 class Project:
-    _current_project = None
-    _config = None
-    _properties = [
-            "video_url",
-            "last_access",
-            ]
-    _write_on_modifying = _properties
+	_current_project = None
 
-    _protected = [
-            "last_access"
-            ]
+	@staticmethod
+	def cmp_func_last_access(name : str):
+		p = Project(name)
+		p.load_config()
+		return p.get("last_access")
 
-    @staticmethod
-    def cmp_func_last_access(name : str):
-        return Project(name, load_anki=False).last_access
+	@classmethod
+	def get_projects(cls):
+		projects = os.listdir(ProjectConfig.root_folder)
+		for p in projects:
+			filepath = os.path.join(ProjectConfig.root_folder, p)
+			if not os.path.isdir(filepath):
+				projects.remove(p)
 
-    @classmethod
-    def get_dirpath(cls, name):
-        return os.path.join(cls._config.projects_folder, name)
+		return projects
 
-    @classmethod
-    def get_json_filepath(cls, name):
-        dir = cls.get_dirpath(name)
+	@classmethod
+	def create_project(cls, name : str, video_url : str):
+		if name in cls.get_projects():
+			raise Exception(f"Projeto existe: {name}")
 
-        return os.path.join(dir, cls._config.json_filename)
+		p = Project(name)
+		p.set("video_url", video_url)
+		p.set("last_access", time())
+		p.write()
 
-    @classmethod
-    def get_timedtext_dirpath(cls, name):
-        dir = cls.get_dirpath(name)
+		cls._current_project = p
 
-        return os.path.join(dir, cls._config.timedtext_folder)
+		return p
 
-    @classmethod
-    def get_timedtext_filepath(cls, name, lang):
-        dir = cls.get_timedtext_dirpath(name)
+	@classmethod
+	def open_project(cls, name):
+		p = Project(name)
+		p.load_all()
+		p.set("last_access", time())
 
-        return os.path.join(dir, cls._config.timedtext_prefix + lang + cls._config.timedtext_suffix)
+		cls._current_project = p
 
-    @classmethod
-    def get_ankifile_filepath(cls, name):
-        dir = cls.get_dirpath(name)
-        return os.path.join(dir, cls._config.anki_filename)
+		return p
 
-    @classmethod
-    def build_tree(cls, name):
+	@classmethod
+	def close_project(cls):
+		cls._current_project = None
 
-        dirpath = cls.get_dirpath(name)
-        os.mkdir(dirpath)
+	@classmethod
+	def current(cls):
+		return cls._current_project
 
-        timedtext_dirpath = cls.get_timedtext_dirpath(name)
-        os.mkdir(timedtext_dirpath)
+	def __init__(self, name : str):
+		self._protected_lock = True
 
-    @classmethod
-    def configure(cls, config : ProjectConfig):
-        if cls._config:
-            raise Exception("Já foi configurado")
+		self.name = name
 
-        cls._config = config
+		self.project_dirpath = os.path.join(ProjectConfig.root_folder, name)
+		self.timedtext_dirpath = os.path.join(self.project_dirpath, ProjectConfig.timedtext_folder)
+		self.config_filepath = os.path.join(self.project_dirpath, ProjectConfig.config_file)
+		self.anki_filepath = os.path.join(self.project_dirpath, ProjectConfig.anki_file)
 
-        if not os.path.isdir(config.projects_folder) and\
-                not os.path.isfile(config.projects_folder):
-                    os.mkdir(config.projects_folder)
+		self.video_url = None
+		self.last_access = None
 
-    @classmethod
-    def create_project(cls, name : str, video_url : str):
-        dirpath = cls.get_dirpath(name)
+		self.properties = {
+				"video_url": None,
+				"last_access": None}
 
-        if name in cls.get_projects():
-            raise Exception(f"Projeto existe: {name}")
+		self.anki_file = None
 
-        cls.build_tree(name)
+	def _lock(self):
+		self._protected_lock = True
 
-        p = Project(name, read=False)
-        p.video_url = video_url
-        p._update_last_access()
-        p.write()
+	def _unlock(self):
+		self._protected_lock = False
 
-        cls._current_project = p
+	def get(self, name):
+		return self.properties[name]
 
-        return p
+	def set(self, name, value):
+		self.properties[name] = value
+		self.write()
 
-    @classmethod
-    def open_project(cls, name):
-        p = Project(name)
-        p._update_last_access()
+	def write(self):
+		
+		if not os.path.isdir(self.project_dirpath):
+			os.makedirs(self.project_dirpath)
 
-        cls._current_project = p
+		for folder in ProjectConfig.folders:
+			path = os.path.join(self.project_dirpath, folder)
 
-        return p
+			if not os.path.isdir(path):
+				os.makedirs(path)
 
-    @classmethod
-    def close_project(cls):
-        cls._current_project = None
+		for file in ProjectConfig.files:
+			path = os.path.join(self.project_dirpath, file)
 
-    @classmethod
-    def get_projects(cls):
-        projects = os.listdir(cls._config.projects_folder)
-        for p in projects:
-            filepath = os.path.join(cls._config.projects_folder, p)
-            if not os.path.isdir(filepath):
-                projects.remove(p)
+			if not os.path.isfile(path):
+				open(path, "w").close()
 
-        return projects
+		with open(self.config_filepath, "w") as f:
+			json.dump(self.properties, f)
 
-    @classmethod
-    def current(cls):
-        return cls._current_project
+	def load_config(self):
+		data = None
+		with open(self.config_filepath, "r") as f:
+			data = json.load(f)
 
-    def __init__(self, name : str, load_anki = True, read = True):
-        self._protected_lock = True
-        self._ready = False
+		self.properties = data
 
-        self.name = name
+	def load_anki(self):
+		self.anki_file = AnkiFile(self.anki_filepath)
 
-        self.dirpath = Project.get_dirpath(name)
-        self.timedtext_dirpath = Project.get_timedtext_dirpath(name)
-        self.json_filepath = Project.get_json_filepath(name)
+	def load_all(self):
+		self.load_config()
+		self.load_anki()
 
-        self.video_url : str = None
-        self.last_access : float = None
+	def get_timedtext_filepath(self, lang):
+		filename = ProjectConfig.timedtext_file_prefix + lang + ProjectConfig.timedtext_file_suffix
 
-        self.anki_file = None
+		return os.path.join(
+				self.project_dirpath,
+				ProjectConfig.timedtext_folder,
+				filename)
 
-        if(load_anki):
-            self.load_anki()
+	def list_timedtext(self):
+		files = os.listdir(self.timedtext_dirpath)
+		tt = [t[len(ProjectConfig.timedtext_file_prefix):-len(ProjectConfig.timedtext_file_suffix)] for t in files]
 
-        self._lock()
+		return tt
 
-        if read:
-            self.read()
+	def save_timedtext(self, lang : str, data):
+		filepath = self.get_timedtext_filepath(lang)
 
-        self._ready = True
+		if os.path.isfile(filepath):
+			raise Warning("Foi tentado criar um ficheiro timedtext que já existia: " + filepath)
 
-    def _lock(self):
-        self._protected_lock = True
+		with open(filepath, "w") as f:
+			json.dump(data, f) 
 
-    def _unlock(self):
-        self._protected_lock = False
+	def load_timedtext(self, lang):
+		lang_list = self.list_timedtext()
 
-    def __setattr__(self, name, value):
-        if name[0] == "_" or not self._ready:
-            return super().__setattr__(name, value)
-
-        if self._protected_lock and\
-            name in self._protected:
-            raise Exception(f"A propriedade é protegida: {name}")
-
-        super().__setattr__(name, value)
-
-        if name in self._write_on_modifying:
-            self.write()
-
-    def write(self):
-        d = {}
-        for x in self._properties:
-            d[x] = getattr(self, x)
-
-        with open(self.json_filepath, "w") as f:
-            json.dump(d, f)
-
-    def read(self):
-        data = None
-        with open(self.json_filepath, "r") as f:
-            data = json.load(f)
-
-        self._unlock()
-
-        for key,val in data.items():
-            if key in self._properties:
-                self.__setattr__(key, val)
-
-        self._lock()
-
-    def load_anki(self):
-        self.anki_file = AnkiFile(Project.get_ankifile_filepath(self.name))
-
-    def _update_last_access(self):
-        self._unlock()
-        self.last_access = time()
-        self._lock()
-
-    def list_timedtext(self):
-        files = os.listdir(self.timedtext_dirpath)
-        tt = [t[len(self._config.timedtext_prefix):-len(self._config.timedtext_suffix)] for t in files]
-
-        return tt
-
-    def save_timedtext(self, lang : str, data):
-        filepath = self.get_timedtext_filepath(self.name, lang)
-
-        if os.path.isfile(filepath):
-            raise Warning("Foi tentado criar um ficheiro timedtext que já existia: " + filepath)
-            return
-
-        with open(filepath, "w") as f:
-           json.dump(data, f) 
-
-    def load_timedtext(self, lang):
-        lang_list = self.list_timedtext()
-
-        if lang not in lang_list:
-            raise Exception("As línguas disponíveis são " + repr(lang_list) + ". Não há alguma que seja " + lang + ".")
-        
-        with open(self.get_timedtext_filepath(self.name, lang), "r") as file:
-            return json.load(file)
+		if lang not in lang_list:
+			raise Exception("As línguas disponíveis são " + repr(lang_list) + ". Não há alguma que seja " + lang + ".")
+		
+		with open(self.get_timedtext_filepath(lang), "r") as file:
+			return json.load(file)
 
 
-    def load_first_timedtext(self):
-        if not self.list_timedtext():
-            return
+	def load_first_timedtext(self):
+		if not self.list_timedtext():
+			return
 
-        return self.load_timedtext(self.list_timedtext()[0])
+		return self.load_timedtext(self.list_timedtext()[0])
 
 
 def __test():
-    config = ProjectConfig("ProjetosDeTeste", "config.json", "anki.txt")
-    proj_name = str(random.randint(0, 9999))
-    Project.configure(config)
-    Project.create_project(proj_name, "queijo")
-    Project.open_project(proj_name)
+	proj_name = str(random.randint(0, 9999))
+	Project.create_project(proj_name, "queijo")
+	Project.open_project(proj_name)
 
 if __name__ == "__main__":
-    __test()
+	__test()

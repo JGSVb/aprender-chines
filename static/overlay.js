@@ -1,6 +1,8 @@
 const overlay = new class {
 	#element = document.getElementById("overlay");
 	#content = document.getElementById("overlayContent");
+	#buttonBox = document.getElementById("overlayButtonBox");
+	#closeButton = document.getElementById("overlayCloseButton");
 
 	#visible = false;
 
@@ -28,5 +30,21 @@ const overlay = new class {
 
 	getVisible() {
 		return this.#visible;
+	}
+
+	_addButton(label, onclick){
+		const btn = document.createElement("button")
+		btn.innerHTML = label
+		btn.onclick = onclick
+		this.#buttonBox.appendChild(btn)
+	}
+
+	setButtons(...buttons){
+		this.#buttonBox.innerHTML = ""
+		this.#buttonBox.appendChild(this.#closeButton)
+
+		for(const b of buttons){
+			this._addButton(b.label, b.onclick)
+		}
 	}
 };
