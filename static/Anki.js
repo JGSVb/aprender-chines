@@ -1,5 +1,5 @@
 // const DEFAULT_ANKI_FORMAT = 6;
-const DEFAULT_ANKI_FORMAT = 6;
+const DEFAULT_ANKI_FORMAT = 5;
 const DEFAULT_ANKI_FIELDS_TEMPLATE = [
 	["hanzi", "汉字", "text", {
 		revertButton: false,

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+		<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+
+	</head>
+	<body>
+
+		<div class="horizontal">
+			<div class="main_container">
+				<video controls>
+					<source src="video">
+					O teu navegador não suporta a etiqueta video
+				</video>
+				<div class="overlay">
+					<input id="boxControlsSwitch" type="checkbox">
+					<canvas id="boxControls"></canvas>
+				</div>
+			</div>
+			<table id="boxList">
+				<tr>
+					<th>Início</th>
+					<th>Fim</th>
+				</tr>
+			</table>
+		</div>
+
+		<script src="{{url_for('static', filename='main.js')}}"></script>
+	
+	</body>
+</html>

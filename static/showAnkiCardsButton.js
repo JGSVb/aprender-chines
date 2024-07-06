@@ -121,6 +121,8 @@ const showAnkiCardsDialog = {
 		overlay.setVisible(true);
 		overlay.setContent(this.dialog);
 
+		overlay.setButtons()
+
 		protocol.getJsonCards().then(function(data){
 			this.json = data;
 			this.populate();

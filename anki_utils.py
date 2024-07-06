@@ -155,6 +155,9 @@ class AnkiFile:
         new_card._lock()
         self.write()
 
+	# TODO: não está a verificar se a carta é repetida ou não
+	# TODO: adicionar self.check_if_card_already_exists ou coisa do género
+	# TODO: no geral, alterar toda a arquitetura anki
     def replace_card(self, id, new_card : AnkiCard):
         card = self.get_card(id)
 
