@@ -4,6 +4,8 @@ import argparse
 import sys
 import os
 
+from args import add_args
+
 app = Flask(__name__)
 
 @app.get("/")
@@ -33,8 +35,7 @@ def video():
 
 def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument("video_filepath", help="caminho para o ficheiro de vídeo")
-	parser.add_argument("boxes_filepath", help="caminho para o ficheiro de saída das caixas")
+	add_args(parser)
 	args = parser.parse_args()
 
 	app.config["video_filepath"] = args.video_filepath

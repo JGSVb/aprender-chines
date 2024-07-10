@@ -71,6 +71,7 @@ class SubtitlesExtractor:
 	def extract(self, boxes, fps):
 		# TODO
 		return self.extract_from_box(boxes[0], fps)
+
 		
 def main():
 	parser = argparse.ArgumentParser()

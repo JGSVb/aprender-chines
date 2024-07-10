@@ -43,12 +43,48 @@ video {
 	height: auto;
 }
 
-#boxControlsSwitch {
+.horizontal {
+	display: flex;
+	flex-direction: row;
+}
+
+.table_container {
+	max-height: 600px;
+	overflow-y: scroll;
+	border-collapse: collapse;
+	border: 2px solid purple;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+td {
+	border: 1px solid purple;
+	padding: 5px;
+}
+
+td button {
+	margin: 2px;
+}
+
+.toolbox {
 	position: absolute;
-	top: 0;
-	left: 0;
-	margin: 5px;
-	width: 25px;
-	height: 25px;
+	background-color: rgba(0,0,0,0.7);
+	width: 100%;
 	pointer-events: all;
+	box-shadow: 0px 5px 10px rgba(0,0,0,0.5);
+}
+
+.toolbox button {
+	margin: 5px;
+}
+
+.toolbox_hidden {
+	opacity: 0;
+}
+
+.toolbox, .toolbox * {
+	transition-duration: 0.25s;
+	transition-timing-function: ease-in-out;
 }
