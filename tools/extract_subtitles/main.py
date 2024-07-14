@@ -4,6 +4,8 @@ import json
 import cv2 as cv
 from paddleocr import PaddleOCR
 import logging
+from shapely.geometry import Polygon
+from functools import lru_cache
 
 logger = logging.getLogger("ppocr")
 logger.setLevel(logging.ERROR)
@@ -23,26 +25,61 @@ class SubtitlesExtractor:
 	def __init__(self, video_filepath, use_gpu=True, lang="ch"):
 		self.video_filepath = video_filepath
 		self.video = cv.VideoCapture(self.video_filepath)
-		self.ocr = PaddleOCR(lang=lang, use_gpu=use_gpu)
 
 		self.video_fps = self.video.get(cv.CAP_PROP_FPS)
 		self.video_frames = self.video.get(cv.CAP_PROP_FRAME_COUNT)
+		self.framecount = self.video.get(cv.CAP_PROP_FRAME_COUNT)
 
-	def extract_at_frame(self, frame_id, box):
+		self.ocr = PaddleOCR(lang=lang, use_gpu=use_gpu)
+
+		def ocr_at_frame(frame_id):
+			return self.ocr.ocr(self.read_frame(frame_id))
+
+		self.ocr_at_frame = lru_cache(maxsize=int(self.framecount))(ocr_at_frame)
+
+	def read_frame(self, frame_id):
 		self.video.set(cv.CAP_PROP_POS_FRAMES, frame_id)
 		ret, frame = self.video.read()
+
+		return ret, frame
+
+	def get_boundaries_at_frame(self, frame_id):
+		ocr = self.ocr_at_frame(frame_id)
+
+		if not ocr:
+			return []
+
+		result = []
+
+		for boundaries, _ in ocr[0]:
+			p = Polygon(*boundaries)
+			result.append(p)
+
+		return result
+
+	def choose_text_at_frame(self, frame_id, box):
+		x1 = box["x1"]
+		y1 = box["y1"]
+		x2 = box["x2"]
+		y2 = box["y2"]
+
+		ocr = self.ocr_at_frame(frame_id)
+		box_polygon = Polygon([(x1, y1), (x1, y2), (x2, y1), (x2, y2)])
+		boundaries = self.get_boundaries_at_frame(frame_id)
+
+		result = []
+
+		for i, b in enumerate(boundaries):
+			if box_polygon.intersects(b):
+				result.append(ocr[0][i][1])
+
+		return result
+
+	def extract_at_frame(self, frame_id, box):
+		result = self.ocr_at_frame(frame_id)
 		
-		if not ret:
+		if not result:
 			return None
-
-		x1 = round(box["x1"])
-		y1 = round(box["y1"])
-		x2 = round(box["x2"])
-		y2 = round(box["y2"])
-
-		frame_crop = frame[y1:y2, x1:x2]
-
-		result = self.ocr.ocr(frame_crop)
 
 		if result[0]:
 			text = " ".join(t for _, (t, _) in result[0])
