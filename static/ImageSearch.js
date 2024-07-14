@@ -54,8 +54,13 @@ class ImageSearch {
 		this.populate()
 	}
 
+	get_widget(){
+		return this.root_element
+	}
+
 	show(){
-		overlay.setContent(this.root_element)
+		overlay.setContent(this.get_widget())
 		overlay.show()
 	}
+
 }

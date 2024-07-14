@@ -24,6 +24,32 @@
 			</div>
 		</template>
 
+		<template id="addNoteDialogTemplate">
+
+			<template id="textFieldTemplate">
+				<div class="text-field">
+					<input/>
+				</div>
+			</template>
+
+			<template id="imageFieldTemplate">
+				<div class="image-field">
+					<button id="searchImageButton">
+						<i class="fa-solid fa-magnifying-glass"></i>
+					</button>
+					<div class="image-container">
+						<img/>
+					</div>
+				</div>
+			</template>
+			
+			<div id="addNoteDialog">
+				<div id="fieldsContainer">
+				</div>
+			</div>
+		
+		</template>
+
 		<template id="optionTemplate">
 			<option id="realOption"></option>
 				<option id="fakeOption" disabled style="font-style:italic"></option>
@@ -171,109 +197,129 @@
 			</div>
 		</div>
 
-		<div class="box" id="infoBox">
-			<button id="returnMainPage" onclick="window.location.href = '/?force_main=1'">
-				<i class="fa-solid fa-arrow-right-from-bracket"></i>
-			</button>
-			<h2>{{project_name}}</h2>
-			<h2>{{video_url}}</h2>
-		</div>
+		<!--<div class="outer">-->
 
-		<div class="box" id="embed-box">
-		<div id="youtubePlayer"></div>
-		</div>
-		<div class="box" id="custom-box">
-			<div id="subtitlesBox">
-				<div class="previous hidden">
-					<div class="text">
-						<div class="chinese"></div>
-						<div class="pinyin"></div>
-					</div>
-					<div class="subtitlesMenu">
-						<button onclick="copyPrevText();">
-							<i class="fa-solid fa-copy"></i>
-						</button>
-						<button onclick="seekToByIndex(chineseText.prevTextIndex);">
-							<i class="fa-solid fa-stopwatch"></i>
-						</button>
-					</div>
-				</div>
-				<div class="current">
-					<div class="text">
-						<div class="chinese"></div>
-						<div class="pinyin"></div>
-					</div>
-					<div class="secondary"></div>
-					<div class="subtitlesMenu">
-						<button onclick="copyCurrText();">
-							<i class="fa-solid fa-copy"></i>
-						</button>
-						<button onclick="seekToByIndex(chineseText.currTextIndex);">
-							<i class="fa-solid fa-stopwatch"></i>
-						</button>
-					</div>
-				</div>
-				<div class="next hidden">
-					<div class="text">
-						<div class="chinese"></div>
-						<div class="pinyin"></div>
-					</div>
-					<div class="subtitlesMenu">
-						<button onclick="copyNextText();">
-							<i class="fa-solid fa-copy"></i>
-						</button>
-						<button onclick="seekToByIndex(chineseText.nextTextIndex);">
-							<i class="fa-solid fa-stopwatch"></i>
-						</button>
-					</div>
-				</div>
+			<div class="box" id="infoBox">
+				<button id="returnMainPage" onclick="window.location.href = '/?force_main=1'">
+					<i class="fa-solid fa-arrow-right-from-bracket"></i>
+				</button>
+				<h2>{{project_name}}</h2>
+				<h2>{{video_url}}</h2>
 			</div>
 
-		</div>
+			<!--<div class="side-panel-container">-->
 
-		<div class="box" id="ankiButtonsBox">
-			<button onclick="addAnkiCardButton()" id="createAnkiCardButton" class="create-anki-card">Criar cartão anki <div id="createAnkiCardButtonChinese"></div></button>
-			<button onclick="showAnkiCardsDialog.show()" id="showAnkiCardsButton">Listar cartões</button>
-		</div>
+				<!--<div class="side-panel">-->
+					<!--<div class="side-panel-content">-->
+						<div class="box" id="embed-box">
+						<div id="youtubePlayer"></div>
+						</div>
+						<div class="box" id="custom-box">
+							<div id="subtitlesBox">
+								<div class="previous hidden">
+									<div class="text">
+										<div class="chinese"></div>
+										<div class="pinyin"></div>
+									</div>
+									<div class="subtitlesMenu">
+										<button onclick="copyPrevText();">
+											<i class="fa-solid fa-copy"></i>
+										</button>
+										<button onclick="seekToByIndex(chineseText.prevTextIndex);">
+											<i class="fa-solid fa-stopwatch"></i>
+										</button>
+									</div>
+								</div>
+								<div class="current">
+									<div class="text">
+										<div class="chinese"></div>
+										<div class="pinyin"></div>
+									</div>
+									<div class="secondary"></div>
+									<div class="subtitlesMenu">
+										<button onclick="copyCurrText();">
+											<i class="fa-solid fa-copy"></i>
+										</button>
+										<button onclick="seekToByIndex(chineseText.currTextIndex);">
+											<i class="fa-solid fa-stopwatch"></i>
+										</button>
+									</div>
+								</div>
+								<div class="next hidden">
+									<div class="text">
+										<div class="chinese"></div>
+										<div class="pinyin"></div>
+									</div>
+									<div class="subtitlesMenu">
+										<button onclick="copyNextText();">
+											<i class="fa-solid fa-copy"></i>
+										</button>
+										<button onclick="seekToByIndex(chineseText.nextTextIndex);">
+											<i class="fa-solid fa-stopwatch"></i>
+										</button>
+									</div>
+								</div>
+							</div>
 
-		<div class="box" id="translator-box">
-			<div class="translator">
-				<div>
-					<text class="preview" id="preview"></text>
-				</div>
-				<div><div class="tt">Frase (EN)</div><text id="translatorEnglishPhrase"></text></div>
-				<div><div class="tt">Frase (PT)</div><text id="translatorPortuguesePhrase"></text></div>
-				<div><div class="tt" id="ttcnen">Seleção (EN)</div><text id="translatorEnglishSelection"></text></div>
-				<div><div class="tt">Seleção (PT)</div><text id="translatorPortugueseSelection"></text></div>
-			</div>
-		</div>
+						</div>
 
-		<div class="box" id="dictionaryContainer"></div>
+						<div class="box" id="ankiButtonsBox">
+							<button onclick="addAnkiCardButton()" id="createAnkiCardButton" class="create-anki-card">Criar cartão anki <div id="createAnkiCardButtonChinese"></div></button>
+							<button onclick="showAnkiCardsDialog.show()" id="showAnkiCardsButton">Listar cartões</button>
+						</div>
 
-		<div class="box" id="dictionaryBox">
-			<input id="searchDict">
-			<div id="resultBox">
-				<div id="exactMatch">
-					<div class="cedict">
-						<img src="{{ url_for('static',filename='images/uk.png') }}">
+						<div class="box" id="dictionaryBox">
+							<input id="searchDict">
+							<div id="resultBox">
+								<div id="exactMatch">
+									<div class="cedict">
+										<img src="{{ url_for('static',filename='images/uk.png') }}">
+									</div>
+									<div class="ptdict">
+										<img src="{{ url_for('static',filename='images/pt.png') }}">
+									</div>
+									<div class="glosbe">
+										<img src="{{ url_for('static',filename='images/glosbe.png') }}">
+									</div>
+								</div>
+								<div id="partialMatch">
+									<div class="cedict">
+									</div>
+									<div class="ptdict">
+									</div>
+									<div class="glosbe">
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<button onclick="temporarioEnquantoNaoMexerNoCodigo()">Esconder</button>
+						<div class="box" id="dictionaryContainer"></div>
+
+						<div class="box" id="translator-box">
+							<div class="translator">
+								<div>
+									<text class="preview" id="preview"></text>
+								</div>
+								<div><div class="tt">Frase (EN)</div><text id="translatorEnglishPhrase"></text></div>
+								<div><div class="tt">Frase (PT)</div><text id="translatorPortuguesePhrase"></text></div>
+								<div><div class="tt" id="ttcnen">Seleção (EN)</div><text id="translatorEnglishSelection"></text></div>
+								<div><div class="tt">Seleção (PT)</div><text id="translatorPortugueseSelection"></text></div>
+							</div>
+						</div>
+					<!--</div>-->
+
+				<!--</div>-->
+
+				<!--<div class="side-panel">-->
+					<div class="side-panel-content">
+						banana
 					</div>
-					<div class="ptdict">
-						<img src="{{ url_for('static',filename='images/pt.png') }}">
-					</div>
-					<div class="glosbe">
-						<img src="{{ url_for('static',filename='images/glosbe.png') }}">
-					</div>
-				</div>
-				<div id="partialMatch">
-					<div class="cedict">
-					</div>
-					<div class="ptdict">
-					</div>
-					<div class="glosbe">
-					</div>
-				</div>
-			</div>
-		</div>
+				<!--</div>-->
+
+			<!--</div>-->
+
+		<!--</div>-->
 
 		<script>
 			const GLOBAL_VIDEO_ID = "{{ video_id }}";
@@ -293,7 +339,10 @@
 		<script src="{{url_for('static', filename='ImageSearch.js')}}"></script>
 		<script src="{{url_for('static', filename='Dictionary.js')}}"></script>
 		<script src="{{url_for('static', filename='script.js')}}"></script>
-		<script>
+		<script src="{{url_for('static', filename='AddNoteDialog.js')}}"></script>
+		<script src="{{url_for('static', filename='App.js')}}"></script>
+		<script src="{{url_for('static', filename='main.js')}}"></script>
+		<script>			
 			function copyCurrText(){
 				navigator.clipboard.writeText(chineseText.currString);
 				notification.sendGood("Copiado com sucesso!");
@@ -328,6 +377,18 @@
 					chineseText.freeze = false;
 				}, timeout);
 			}
+
+			function temporarioEnquantoNaoMexerNoCodigo(){
+				let elem = document.getElementById('dictionaryContainer')
+				let style = elem.style
+
+				if(style.display != "none"){
+					style.display = "none"
+				} else {
+					style.display = "block"
+				}
+			}
+
 		</script>
 	</body>
 </html>
