@@ -1,0 +1,37 @@
+:root {
+	--bg1: #17153B;
+	--bg2: #2E236C;
+	--bg3: #443C68;
+	--bg-disabled: red;
+	--bg-floating: rgba(0,0,0,0.7);
+	--fg1: #fffae6;
+	--fg-disabled: rgba(255, 0, 0, 1);
+	--fg-enabled: blue;
+	--border1: #433D8B;
+	--border2: #C8ACD6;
+	--shadow: rgba(26, 18, 11, 0.2);
+	--strong-shadow: rgba(0, 0, 0, 0.7);
+	--color1: #20bbff;
+	--red: red;
+	--sep-fg: red;
+	--text-highlight: yellow;
+	--font-normal: 20px;
+	--font-small: 15px;
+	--font-extra-small: 10px;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	color: var(--fg1);
+	font-family: Roboto;
+	font-size: var(--font-normal);
+}
+
+body {
+	height: 100vh;
+}
+
+main {
+	background-color: black;
+}
