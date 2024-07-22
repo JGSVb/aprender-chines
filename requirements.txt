@@ -6,3 +6,5 @@ pinyin_tone_converter==1.0.2
 python-dotenv==1.0.1
 beautifulsoup4==4.12.3
 shapely==2.0.4
+flask_cors==4.0.1
+Levenshtein==0.25.1
